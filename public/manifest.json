@@ -1,0 +1,17 @@
+{
+  "name": "Fipe Scanner",
+  "short_name": "FipeScanner",
+  "description": "Compre seu carro usado com segurança. Consulte FIPE, simule financiamento e avalie negócios.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#e63312",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
