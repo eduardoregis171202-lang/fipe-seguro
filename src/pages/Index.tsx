@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { Gauge, ClipboardCheck, Wallet, Flame } from "lucide-react";
+import { Gauge, ClipboardCheck, Wallet, Flame, Sun, Moon } from "lucide-react";
 import CotacaoTab from "@/components/fipe/CotacaoTab";
 import VistoriaTab from "@/components/fipe/VistoriaTab";
 import CustoTab from "@/components/fipe/CustoTab";
+import { useTheme } from "@/hooks/useTheme";
 
 type TabId = 'cotacao' | 'vistoria' | 'custo';
 
@@ -14,6 +15,7 @@ const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
 
 const Index = () => {
   const [activeTab, setActiveTab] = useState<TabId>('cotacao');
+  const { theme, toggleTheme } = useTheme();
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -30,6 +32,9 @@ const Index = () => {
               </h1>
               <p className="text-[10px] text-muted-foreground -mt-0.5">Compre seu carro com segurança</p>
             </div>
+            <button onClick={toggleTheme} className="ml-auto w-9 h-9 rounded-xl bg-secondary flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors active:scale-95">
+              {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+            </button>
           </div>
 
           {/* Scrollable Tab Bar */}
