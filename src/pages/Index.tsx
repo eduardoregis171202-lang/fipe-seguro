@@ -1,24 +1,32 @@
 import { useState } from "react";
-import { Search, ShieldCheck, Gauge, Flame } from "lucide-react";
-import PesquisaTab from "@/components/fipe/PesquisaTab";
+import { Gauge, ShieldCheck, Calculator, ClipboardCheck, ArrowLeftRight, Wallet, History, Flame } from "lucide-react";
 import CotacaoTab from "@/components/fipe/CotacaoTab";
+import FinanciamentoTab from "@/components/fipe/FinanciamentoTab";
+import VistoriaTab from "@/components/fipe/VistoriaTab";
+import ComparadorTab from "@/components/fipe/ComparadorTab";
+import CustoTab from "@/components/fipe/CustoTab";
+import HistoricoTab from "@/components/fipe/HistoricoTab";
 
-type TabId = 'pesquisa' | 'cotacao';
+type TabId = 'cotacao' | 'financiamento' | 'vistoria' | 'comparador' | 'custo' | 'historico';
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: 'pesquisa', label: 'Pesquisa', icon: <Search className="w-5 h-5" /> },
-  { id: 'cotacao', label: 'Cotação', icon: <Gauge className="w-5 h-5" /> },
+  { id: 'cotacao', label: 'Cotação', icon: <Gauge className="w-4.5 h-4.5" /> },
+  { id: 'financiamento', label: 'Financ.', icon: <Calculator className="w-4.5 h-4.5" /> },
+  { id: 'vistoria', label: 'Vistoria', icon: <ClipboardCheck className="w-4.5 h-4.5" /> },
+  { id: 'comparador', label: 'Comparar', icon: <ArrowLeftRight className="w-4.5 h-4.5" /> },
+  { id: 'custo', label: 'Custo', icon: <Wallet className="w-4.5 h-4.5" /> },
+  { id: 'historico', label: 'Histórico', icon: <History className="w-4.5 h-4.5" /> },
 ];
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('pesquisa');
+  const [activeTab, setActiveTab] = useState<TabId>('cotacao');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/40 px-4 pt-3 pb-2">
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/40 px-4 pt-3 pb-0">
         <div className="max-w-lg mx-auto">
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center glow-primary">
               <Flame className="w-5 h-5 text-primary-foreground" />
             </div>
@@ -29,35 +37,36 @@ const Index = () => {
               <p className="text-[10px] text-muted-foreground -mt-0.5">Compre seu carro com segurança</p>
             </div>
           </div>
-          {/* Ember line */}
-          <div className="ember-line mt-3 rounded-full" />
+
+          {/* Scrollable Tab Bar */}
+          <div className="flex gap-1 overflow-x-auto pb-2 -mx-1 px-1 scrollbar-hide" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-all duration-200 active:scale-[0.95] shrink-0 ${
+                  activeTab === tab.id
+                    ? 'gradient-primary text-primary-foreground glow-primary'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-secondary'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
+            ))}
+          </div>
+          <div className="ember-line rounded-full" />
         </div>
       </header>
 
-      {/* Tab Switcher */}
-      <div className="sticky top-[68px] z-30 bg-background/80 backdrop-blur-xl px-4 py-2.5">
-        <div className="max-w-lg mx-auto flex gap-2">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.97] ${
-                activeTab === tab.id
-                  ? 'gradient-primary text-primary-foreground glow-primary'
-                  : 'bg-secondary text-muted-foreground hover:text-foreground'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {/* Content */}
-      <main className="flex-1 px-4 py-4 pb-6 max-w-lg mx-auto w-full">
-        {activeTab === 'pesquisa' && <PesquisaTab />}
+      <main className="flex-1 px-4 py-5 pb-8 max-w-lg mx-auto w-full">
         {activeTab === 'cotacao' && <CotacaoTab />}
+        {activeTab === 'financiamento' && <FinanciamentoTab />}
+        {activeTab === 'vistoria' && <VistoriaTab />}
+        {activeTab === 'comparador' && <ComparadorTab />}
+        {activeTab === 'custo' && <CustoTab />}
+        {activeTab === 'historico' && <HistoricoTab />}
       </main>
 
       {/* Footer */}
