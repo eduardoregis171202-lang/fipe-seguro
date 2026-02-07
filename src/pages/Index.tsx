@@ -1,16 +1,18 @@
 import { useState } from "react";
-import { Gauge, ClipboardCheck, Wallet, Flame, Sun, Moon } from "lucide-react";
+import { Gauge, ClipboardCheck, Wallet, Flame, Sun, Moon, ShieldCheck } from "lucide-react";
 import CotacaoTab from "@/components/fipe/CotacaoTab";
 import VistoriaTab from "@/components/fipe/VistoriaTab";
 import CustoTab from "@/components/fipe/CustoTab";
+import DetranTab from "@/components/fipe/DetranTab";
 import { useTheme } from "@/hooks/useTheme";
 
-type TabId = 'cotacao' | 'vistoria' | 'custo';
+type TabId = 'cotacao' | 'vistoria' | 'custo' | 'detran';
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'cotacao', label: 'Cotação', icon: <Gauge className="w-4.5 h-4.5" /> },
   { id: 'vistoria', label: 'Vistoria', icon: <ClipboardCheck className="w-4.5 h-4.5" /> },
   { id: 'custo', label: 'Custo', icon: <Wallet className="w-4.5 h-4.5" /> },
+  { id: 'detran', label: 'Detran', icon: <ShieldCheck className="w-4.5 h-4.5" /> },
 ];
 
 const Index = () => {
@@ -63,6 +65,7 @@ const Index = () => {
         {activeTab === 'cotacao' && <CotacaoTab />}
         {activeTab === 'vistoria' && <VistoriaTab />}
         {activeTab === 'custo' && <CustoTab />}
+        {activeTab === 'detran' && <DetranTab />}
       </main>
 
       {/* Footer */}
