@@ -1,19 +1,17 @@
 import { useState } from "react";
-import { Car, Search, ShieldCheck, Scan } from "lucide-react";
-import CarIdealTab from "@/components/fipe/CarIdealTab";
+import { Search, ShieldCheck, Scan } from "lucide-react";
 import PesquisaTab from "@/components/fipe/PesquisaTab";
 import CotacaoTab from "@/components/fipe/CotacaoTab";
 
-type TabId = 'ideal' | 'pesquisa' | 'cotacao';
+type TabId = 'pesquisa' | 'cotacao';
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: 'ideal', label: 'Carro Ideal', icon: <Car className="w-5 h-5" /> },
   { id: 'pesquisa', label: 'Pesquisa', icon: <Search className="w-5 h-5" /> },
   { id: 'cotacao', label: 'Cotação', icon: <ShieldCheck className="w-5 h-5" /> },
 ];
 
 const Index = () => {
-  const [activeTab, setActiveTab] = useState<TabId>('ideal');
+  const [activeTab, setActiveTab] = useState<TabId>('pesquisa');
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -32,7 +30,6 @@ const Index = () => {
 
       {/* Content */}
       <main className="flex-1 px-4 py-5 pb-24 max-w-lg mx-auto w-full">
-        {activeTab === 'ideal' && <CarIdealTab />}
         {activeTab === 'pesquisa' && <PesquisaTab />}
         {activeTab === 'cotacao' && <CotacaoTab />}
       </main>
