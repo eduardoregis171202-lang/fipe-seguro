@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Gauge, Zap, Bookmark, Search, ChevronDown, Calculator, TrendingDown, DollarSign, AlertCircle, TrendingUp } from "lucide-react";
+import { Gauge, Zap, Search, ChevronDown, Calculator, TrendingDown, DollarSign, AlertCircle, TrendingUp } from "lucide-react";
 import {
   fetchMarcas, fetchModelos, fetchAnos, fetchPreco, parseFipeValue,
   formatCurrency, generateSimulatedHistory,
@@ -402,11 +402,6 @@ const CotacaoTab = () => {
                 <DealGauge percentage={dealResult.percentage} label={dealResult.label} color={dealResult.zone} />
                 <div className="ember-line w-full my-4" />
                 <p className="text-sm text-foreground/90 text-center leading-relaxed font-medium">{dealResult.message}</p>
-                {saved && (
-                  <div className="mt-3 flex items-center gap-1.5 text-[10px] text-accent font-medium">
-                    <Bookmark className="w-3 h-3" /> Salvo no histórico
-                  </div>
-                )}
               </div>
 
             </div>
