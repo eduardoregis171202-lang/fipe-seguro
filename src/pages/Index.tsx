@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, ShieldCheck, Scan } from "lucide-react";
+import { Search, ShieldCheck, Gauge, Flame } from "lucide-react";
 import PesquisaTab from "@/components/fipe/PesquisaTab";
 import CotacaoTab from "@/components/fipe/CotacaoTab";
 
@@ -7,7 +7,7 @@ type TabId = 'pesquisa' | 'cotacao';
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'pesquisa', label: 'Pesquisa', icon: <Search className="w-5 h-5" /> },
-  { id: 'cotacao', label: 'Cotação', icon: <ShieldCheck className="w-5 h-5" /> },
+  { id: 'cotacao', label: 'Cotação', icon: <Gauge className="w-5 h-5" /> },
 ];
 
 const Index = () => {
@@ -16,46 +16,58 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border/50 px-4 py-3">
-        <div className="max-w-lg mx-auto flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl gradient-primary flex items-center justify-center">
-            <Scan className="w-5 h-5 text-primary-foreground" />
+      <header className="sticky top-0 z-40 bg-background/90 backdrop-blur-xl border-b border-border/40 px-4 pt-3 pb-2">
+        <div className="max-w-lg mx-auto">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl gradient-primary flex items-center justify-center glow-primary">
+              <Flame className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-lg font-bold font-display text-gradient tracking-tight">
+                Fipe Scanner
+              </h1>
+              <p className="text-[10px] text-muted-foreground -mt-0.5">Compre seu carro com segurança</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-base font-bold text-foreground tracking-tight">Fipe Scanner</h1>
-            <p className="text-[10px] text-muted-foreground">Compre seu carro com segurança</p>
-          </div>
+          {/* Ember line */}
+          <div className="ember-line mt-3 rounded-full" />
         </div>
       </header>
 
-      {/* Content */}
-      <main className="flex-1 px-4 py-5 pb-24 max-w-lg mx-auto w-full">
-        {activeTab === 'pesquisa' && <PesquisaTab />}
-        {activeTab === 'cotacao' && <CotacaoTab />}
-      </main>
-
-      {/* Bottom Tab Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-bottom">
-        <div className="max-w-lg mx-auto flex">
+      {/* Tab Switcher */}
+      <div className="sticky top-[68px] z-30 bg-background/80 backdrop-blur-xl px-4 py-2.5">
+        <div className="max-w-lg mx-auto flex gap-2">
           {tabs.map(tab => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 transition-colors ${
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 active:scale-[0.97] ${
                 activeTab === tab.id
-                  ? 'text-primary'
-                  : 'text-muted-foreground'
+                  ? 'gradient-primary text-primary-foreground glow-primary'
+                  : 'bg-secondary text-muted-foreground hover:text-foreground'
               }`}
             >
               {tab.icon}
-              <span className="text-[10px] font-medium">{tab.label}</span>
-              {activeTab === tab.id && (
-                <div className="w-1 h-1 rounded-full bg-primary" />
-              )}
+              {tab.label}
             </button>
           ))}
         </div>
-      </nav>
+      </div>
+
+      {/* Content */}
+      <main className="flex-1 px-4 py-4 pb-6 max-w-lg mx-auto w-full">
+        {activeTab === 'pesquisa' && <PesquisaTab />}
+        {activeTab === 'cotacao' && <CotacaoTab />}
+      </main>
+
+      {/* Footer */}
+      <footer className="px-4 py-4 border-t border-border/30">
+        <div className="max-w-lg mx-auto text-center">
+          <p className="text-[10px] text-muted-foreground">
+            Dados fornecidos pela Tabela FIPE · Fipe Scanner © {new Date().getFullYear()}
+          </p>
+        </div>
+      </footer>
     </div>
   );
 };

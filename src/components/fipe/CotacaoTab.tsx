@@ -1,5 +1,5 @@
-import { useState, useMemo } from "react";
-import { Calculator, MessageCircle, ShieldAlert } from "lucide-react";
+import { useState } from "react";
+import { Calculator, MessageCircle, ShieldAlert, Gauge, Zap } from "lucide-react";
 import { formatCurrency } from "@/services/fipeApi";
 import DealGauge from "./DealGauge";
 
@@ -25,48 +25,18 @@ function evaluateDeal(fipeValue: number, adValue: number, km: number, carYear: n
   }
 
   if (percentage < 80) {
-    return {
-      percentage,
-      zone: 'red',
-      label: "ALERTA VERMELHO",
-      message: "Preço muito abaixo da FIPE. Provável golpe, sinistro, ou problema grave oculto. Desconfie!",
-      kmAlert,
-    };
+    return { percentage, zone: 'red', label: "ALERTA VERMELHO", message: "Preço muito abaixo da FIPE. Provável golpe, sinistro, ou problema grave oculto. Desconfie!", kmAlert };
   }
   if (percentage >= 80 && percentage <= 95) {
-    return {
-      percentage,
-      zone: 'green',
-      label: "ÓTIMA OPORTUNIDADE",
-      message: "Preço abaixo da FIPE! Pode ser uma boa oportunidade, mas faça vistoria completa antes de fechar.",
-      kmAlert,
-    };
+    return { percentage, zone: 'green', label: "ÓTIMA OPORTUNIDADE", message: "Preço abaixo da FIPE! Pode ser uma boa oportunidade, mas faça vistoria completa antes de fechar.", kmAlert };
   }
   if (percentage > 95 && percentage <= 105) {
-    return {
-      percentage,
-      zone: 'green',
-      label: "PREÇO JUSTO",
-      message: "Dentro da faixa normal de mercado. Negocie com segurança e faça vistoria cautelar.",
-      kmAlert,
-    };
+    return { percentage, zone: 'green', label: "PREÇO JUSTO", message: "Dentro da faixa normal de mercado. Negocie com segurança e faça vistoria cautelar.", kmAlert };
   }
   if (percentage > 105 && percentage <= 120) {
-    return {
-      percentage,
-      zone: 'yellow',
-      label: "ACIMA DA FIPE",
-      message: "Preço acima da tabela. Só vale se o carro estiver impecável e com baixa quilometragem.",
-      kmAlert,
-    };
+    return { percentage, zone: 'yellow', label: "ACIMA DA FIPE", message: "Preço acima da tabela. Só vale se o carro estiver impecável e com baixa quilometragem.", kmAlert };
   }
-  return {
-    percentage,
-    zone: 'yellow',
-    label: "MUITO CARO",
-    message: "Preço muito acima da FIPE. Não pague isso. Negocie fortemente ou busque outras opções.",
-    kmAlert,
-  };
+  return { percentage, zone: 'yellow', label: "MUITO CARO", message: "Preço muito acima da FIPE. Não pague isso. Negocie fortemente ou busque outras opções.", kmAlert };
 }
 
 const CotacaoTab = () => {
@@ -81,9 +51,7 @@ const CotacaoTab = () => {
     const ad = Number(adValue.replace(/\D/g, ''));
     const kmNum = Number(km.replace(/\D/g, ''));
     const year = Number(carYear);
-
     if (!fipe || !ad || !kmNum || !year || year < 1990 || year > new Date().getFullYear() + 1) return;
-
     setResult(evaluateDeal(fipe, ad, kmNum, year));
   };
 
@@ -100,68 +68,65 @@ const CotacaoTab = () => {
     return Number(num).toLocaleString('pt-BR');
   };
 
+  const InputField = ({ label, icon, value, onChange, placeholder }: {
+    label: string; icon: string; value: string; onChange: (v: string) => void; placeholder: string;
+  }) => (
+    <div>
+      <label className="text-xs font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">
+        {icon} {label}
+      </label>
+      <input
+        type="text"
+        inputMode="numeric"
+        placeholder={placeholder}
+        value={value}
+        onChange={e => onChange(formatInput(e.target.value))}
+        className="w-full px-4 rounded-xl bg-secondary text-foreground border border-border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-muted-foreground/50 transition-all"
+        style={{ height: '52px' }}
+      />
+    </div>
+  );
+
   return (
     <div className="space-y-5">
-      <div className="glass-card rounded-xl p-4 space-y-4">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-          <Calculator className="w-4 h-4" />
-          Dealometer — Vale a pena?
-        </h2>
-
-        <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor da Tabela FIPE (R$)</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="Ex: 45.000"
-            value={fipeValue}
-            onChange={e => setFipeValue(formatInput(e.target.value))}
-            className="w-full h-12 px-4 rounded-xl bg-secondary text-foreground border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
-          />
-        </div>
-
-        <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Valor do Anúncio (R$)</label>
-          <input
-            type="text"
-            inputMode="numeric"
-            placeholder="Ex: 42.000"
-            value={adValue}
-            onChange={e => setAdValue(formatInput(e.target.value))}
-            className="w-full h-12 px-4 rounded-xl bg-secondary text-foreground border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Quilometragem</label>
-            <input
-              type="text"
-              inputMode="numeric"
-              placeholder="Ex: 60.000"
-              value={km}
-              onChange={e => setKm(formatInput(e.target.value))}
-              className="w-full h-12 px-4 rounded-xl bg-secondary text-foreground border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
-            />
+      {/* Form */}
+      <div className="glass-card rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+            <Gauge className="w-4 h-4 text-primary-foreground" />
           </div>
           <div>
-            <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Ano do carro</label>
+            <h2 className="text-sm font-bold font-display text-foreground">Dealometer</h2>
+            <p className="text-[10px] text-muted-foreground">Descubra se o negócio vale a pena</p>
+          </div>
+        </div>
+
+        <InputField label="Valor FIPE" icon="📊" value={fipeValue} onChange={setFipeValue} placeholder="Ex: 45.000" />
+        <InputField label="Valor do Anúncio" icon="💰" value={adValue} onChange={setAdValue} placeholder="Ex: 42.000" />
+
+        <div className="grid grid-cols-2 gap-3">
+          <InputField label="Quilometragem" icon="🛣️" value={km} onChange={setKm} placeholder="Ex: 60.000" />
+          <div>
+            <label className="text-xs font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">
+              📅 Ano
+            </label>
             <input
               type="text"
               inputMode="numeric"
               placeholder="Ex: 2018"
               value={carYear}
               onChange={e => setCarYear(e.target.value.replace(/\D/g, '').slice(0, 4))}
-              className="w-full h-12 px-4 rounded-xl bg-secondary text-foreground border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-muted-foreground"
+              className="w-full px-4 rounded-xl bg-secondary text-foreground border border-border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary placeholder:text-muted-foreground/50 transition-all"
+              style={{ height: '52px' }}
             />
           </div>
         </div>
 
         <button
           onClick={handleEvaluate}
-          className="w-full py-3.5 rounded-xl gradient-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+          className="w-full py-4 rounded-xl gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97] glow-primary"
         >
-          <ShieldAlert className="w-4 h-4" />
+          <Zap className="w-4 h-4" />
           Avaliar Negócio
         </button>
       </div>
@@ -169,16 +134,18 @@ const CotacaoTab = () => {
       {/* Result */}
       {result && (
         <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300 space-y-4">
-          <div className="glass-card rounded-xl p-5 flex flex-col items-center">
+          <div className="glass-card rounded-2xl p-6 flex flex-col items-center">
             <DealGauge percentage={result.percentage} label={result.label} color={result.zone} />
-            
-            <p className="text-sm text-foreground/90 text-center mt-4 leading-relaxed">
+
+            <div className="ember-line w-full my-4" />
+
+            <p className="text-sm text-foreground/90 text-center leading-relaxed font-medium">
               {result.message}
             </p>
 
             {result.kmAlert && (
-              <div className="mt-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 w-full">
-                <p className="text-xs text-destructive">{result.kmAlert}</p>
+              <div className="mt-3 p-4 rounded-xl bg-destructive/10 border border-destructive/30 w-full">
+                <p className="text-xs text-destructive font-medium">{result.kmAlert}</p>
               </div>
             )}
           </div>
@@ -187,7 +154,7 @@ const CotacaoTab = () => {
           {result.zone === 'green' && (
             <button
               onClick={() => handleCTA('good')}
-              className="w-full py-4 rounded-xl gradient-success text-success-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98] animate-pulse-glow"
+              className="w-full py-4 rounded-xl gradient-success text-success-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97] animate-pulse-glow"
             >
               <MessageCircle className="w-5 h-5" />
               Boa oferta! Quer uma vistoria antes de pagar?
@@ -196,7 +163,7 @@ const CotacaoTab = () => {
           {result.zone === 'red' && (
             <button
               onClick={() => handleCTA('bad')}
-              className="w-full py-4 rounded-xl gradient-danger text-destructive-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+              className="w-full py-4 rounded-xl gradient-danger text-destructive-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97]"
             >
               <MessageCircle className="w-5 h-5" />
               Isso parece golpe. Quer ajuda para um carro seguro?
@@ -205,7 +172,7 @@ const CotacaoTab = () => {
           {result.zone === 'yellow' && (
             <button
               onClick={() => handleCTA('bad')}
-              className="w-full py-4 rounded-xl gradient-warning text-warning-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
+              className="w-full py-4 rounded-xl gradient-warning text-warning-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97]"
             >
               <MessageCircle className="w-5 h-5" />
               Está caro. Quer ajuda para negociar melhor?
