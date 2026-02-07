@@ -1,19 +1,15 @@
 import { useState } from "react";
-import { Gauge, ClipboardCheck, ArrowLeftRight, Wallet, History, Flame } from "lucide-react";
+import { Gauge, ClipboardCheck, Wallet, Flame } from "lucide-react";
 import CotacaoTab from "@/components/fipe/CotacaoTab";
 import VistoriaTab from "@/components/fipe/VistoriaTab";
-import ComparadorTab from "@/components/fipe/ComparadorTab";
 import CustoTab from "@/components/fipe/CustoTab";
-import HistoricoTab from "@/components/fipe/HistoricoTab";
 
-type TabId = 'cotacao' | 'vistoria' | 'comparador' | 'custo' | 'historico';
+type TabId = 'cotacao' | 'vistoria' | 'custo';
 
 const tabs: { id: TabId; label: string; icon: React.ReactNode }[] = [
   { id: 'cotacao', label: 'Cotação', icon: <Gauge className="w-4.5 h-4.5" /> },
   { id: 'vistoria', label: 'Vistoria', icon: <ClipboardCheck className="w-4.5 h-4.5" /> },
-  { id: 'comparador', label: 'Comparar', icon: <ArrowLeftRight className="w-4.5 h-4.5" /> },
   { id: 'custo', label: 'Custo', icon: <Wallet className="w-4.5 h-4.5" /> },
-  { id: 'historico', label: 'Histórico', icon: <History className="w-4.5 h-4.5" /> },
 ];
 
 const Index = () => {
@@ -61,9 +57,7 @@ const Index = () => {
       <main className="flex-1 px-4 py-5 pb-8 max-w-lg mx-auto w-full">
         {activeTab === 'cotacao' && <CotacaoTab />}
         {activeTab === 'vistoria' && <VistoriaTab />}
-        {activeTab === 'comparador' && <ComparadorTab />}
         {activeTab === 'custo' && <CustoTab />}
-        {activeTab === 'historico' && <HistoricoTab />}
       </main>
 
       {/* Footer */}

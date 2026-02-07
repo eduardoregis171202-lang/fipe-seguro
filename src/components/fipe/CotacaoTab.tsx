@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { MessageCircle, Gauge, Zap, Bookmark, Search, ChevronDown, Calculator, TrendingDown, DollarSign, AlertCircle, TrendingUp } from "lucide-react";
+import { Gauge, Zap, Bookmark, Search, ChevronDown, Calculator, TrendingDown, DollarSign, AlertCircle, TrendingUp } from "lucide-react";
 import {
   fetchMarcas, fetchModelos, fetchAnos, fetchPreco, parseFipeValue,
   formatCurrency, generateSimulatedHistory,
@@ -283,12 +283,6 @@ const CotacaoTab = () => {
     setSaved(true);
   };
 
-  const handleCTA = (type: 'good' | 'bad') => {
-    const msg = type === 'good'
-      ? "Olá! Encontrei uma boa oferta no Fipe Scanner e gostaria de uma vistoria técnica antes de fechar negócio."
-      : "Olá! O Fipe Scanner indicou que uma oferta parece suspeita. Pode me ajudar a encontrar um carro seguro?";
-    window.open(`https://wa.me/5511999999999?text=${encodeURIComponent(msg)}`, '_blank');
-  };
 
   return (
     <div className="space-y-5">
@@ -415,27 +409,6 @@ const CotacaoTab = () => {
                 )}
               </div>
 
-              {dealResult.zone === 'green' && (
-                <button onClick={() => handleCTA('good')}
-                  className="w-full py-4 rounded-xl gradient-success text-success-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97] animate-pulse-glow">
-                  <MessageCircle className="w-5 h-5" />
-                  Boa oferta! Quer uma vistoria antes de pagar?
-                </button>
-              )}
-              {dealResult.zone === 'red' && (
-                <button onClick={() => handleCTA('bad')}
-                  className="w-full py-4 rounded-xl gradient-danger text-destructive-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97]">
-                  <MessageCircle className="w-5 h-5" />
-                  Isso parece golpe. Quer ajuda para um carro seguro?
-                </button>
-              )}
-              {dealResult.zone === 'yellow' && (
-                <button onClick={() => handleCTA('bad')}
-                  className="w-full py-4 rounded-xl gradient-warning text-warning-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97]">
-                  <MessageCircle className="w-5 h-5" />
-                  Está caro. Quer ajuda para negociar melhor?
-                </button>
-              )}
             </div>
           )}
 
