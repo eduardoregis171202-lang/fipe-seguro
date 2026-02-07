@@ -31,22 +31,58 @@ const DETRAN_URLS: Record<string, { nome: string; url: string }> = {
   TO: { nome: "Tocantins", url: "https://www.detran.to.gov.br" },
 };
 
-// Mapeamento simplificado: primeira letra da placa → estado(s) mais comuns
-// Formato antigo: ABC-1234 / Mercosul: ABC1D23
-const PLACA_UF_MAP: Record<string, string> = {
-  // Antigas
-  A: "SP", B: "SP", C: "SP", D: "SP", E: "MG", F: "MG",
-  G: "MG", H: "MG", I: "PR", J: "PR", K: "SC", L: "RS",
-  M: "RS", N: "RS", O: "BA", P: "BA", Q: "CE", R: "PE",
-  S: "RJ", T: "RJ", U: "GO", V: "DF", W: "MT", X: "PA",
-  Y: "AM", Z: "AL",
-};
+// Faixas reais de placas por estado brasileiro (3 primeiras letras)
+const PLACA_FAIXAS: { inicio: string; fim: string; uf: string }[] = [
+  { inicio: "AAA", fim: "BEZ", uf: "PR" },
+  { inicio: "BFA", fim: "GKI", uf: "SP" },
+  { inicio: "GKJ", fim: "HOK", uf: "MG" },  // Maranhão na faixa real é menor
+  { inicio: "HOL", fim: "HTW", uf: "MS" },
+  { inicio: "HTX", fim: "HZA", uf: "MT" },
+  { inicio: "HZB", fim: "JAM", uf: "GO" },
+  { inicio: "JAN", fim: "JDO", uf: "DF" },
+  { inicio: "JDP", fim: "JTP", uf: "BA" },
+  { inicio: "JTQ", fim: "JWZ", uf: "SE" },
+  { inicio: "JXA", fim: "KCZ", uf: "PE" },
+  { inicio: "KDA", fim: "KEZ", uf: "AL" },
+  { inicio: "KFA", fim: "KMZ", uf: "PB" },
+  { inicio: "KNA", fim: "KQZ", uf: "RN" },
+  { inicio: "KRA", fim: "KVZ", uf: "CE" },
+  { inicio: "KWA", fim: "KZZ", uf: "PI" },
+  { inicio: "LAA", fim: "LEZ", uf: "MA" },
+  { inicio: "LFA", fim: "LHZ", uf: "PA" },
+  { inicio: "LIA", fim: "LKZ", uf: "AP" },
+  { inicio: "LLA", fim: "LMZ", uf: "AM" },
+  { inicio: "LNA", fim: "LOZ", uf: "RR" },
+  { inicio: "LPA", fim: "LRZ", uf: "RO" },
+  { inicio: "LSA", fim: "LVZ", uf: "AC" },
+  { inicio: "LWA", fim: "LZZ", uf: "TO" },
+  { inicio: "MAA", fim: "MOZ", uf: "MG" },
+  { inicio: "MPA", fim: "MZZ", uf: "MG" },
+  { inicio: "NAA", fim: "NPZ", uf: "RJ" },
+  { inicio: "NQA", fim: "NZZ", uf: "RJ" },
+  { inicio: "OAA", fim: "OKZ", uf: "SP" },
+  { inicio: "OLA", fim: "QMZ", uf: "SP" },
+  { inicio: "QNA", fim: "QNZ", uf: "RS" },
+  { inicio: "QOA", fim: "QZZ", uf: "RS" },
+  { inicio: "RAA", fim: "RJZ", uf: "PR" },
+  { inicio: "RKA", fim: "RZZ", uf: "PR" },
+  { inicio: "SAA", fim: "SBZ", uf: "RS" },
+  { inicio: "SCA", fim: "SKZ", uf: "RS" },
+  { inicio: "SLA", fim: "SZZ", uf: "RS" },
+  { inicio: "TAA", fim: "TZZ", uf: "SC" },
+];
 
 function detectUF(placa: string): string | null {
   const clean = placa.toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (clean.length < 3) return null;
-  const firstLetter = clean[0];
-  return PLACA_UF_MAP[firstLetter] || null;
+  const prefix = clean.slice(0, 3);
+
+  for (const faixa of PLACA_FAIXAS) {
+    if (prefix >= faixa.inicio && prefix <= faixa.fim) {
+      return faixa.uf;
+    }
+  }
+  return null;
 }
 
 function isValidPlaca(placa: string): boolean {
@@ -66,7 +102,6 @@ function formatPlaca(value: string): string {
 const DetranTab = () => {
   const [placa, setPlaca] = useState("");
   const [selectedUF, setSelectedUF] = useState("");
-  const [detectedUF, setDetectedUF] = useState<string | null>(null);
   const [error, setError] = useState("");
 
   const handlePlacaChange = (value: string) => {
@@ -78,11 +113,8 @@ const DetranTab = () => {
     if (clean.length >= 3) {
       const uf = detectUF(clean);
       if (uf) {
-        setDetectedUF(uf);
         setSelectedUF(uf);
       }
-    } else {
-      setDetectedUF(null);
     }
   };
 
@@ -131,15 +163,8 @@ const DetranTab = () => {
           />
         </div>
 
-        {/* UF detected / select */}
-        {detectedUF && DETRAN_URLS[detectedUF] && (
-          <div className="flex items-center gap-2 p-3 rounded-xl bg-accent/10 border border-accent/30">
-            <MapPin className="w-4 h-4 text-accent shrink-0" />
-            <p className="text-xs text-foreground">
-              Estado detectado: <span className="font-bold text-accent">{DETRAN_URLS[detectedUF].nome} ({detectedUF})</span>
-            </p>
-          </div>
-        )}
+
+
 
         <div>
           <label className="text-xs font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">
