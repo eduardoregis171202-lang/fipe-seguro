@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -24,14 +23,24 @@ const PriceChart = ({ labels, data }: PriceChartProps) => {
       {
         label: "Preço FIPE",
         data,
-        borderColor: "hsl(270, 70%, 55%)",
-        backgroundColor: "hsla(270, 70%, 55%, 0.1)",
+        borderColor: "hsl(12, 90%, 52%)",
+        backgroundColor: (ctx: any) => {
+          const chart = ctx.chart;
+          const { ctx: canvasCtx, chartArea } = chart;
+          if (!chartArea) return "hsla(12, 90%, 52%, 0.1)";
+          const gradient = canvasCtx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+          gradient.addColorStop(0, "hsla(12, 90%, 52%, 0.25)");
+          gradient.addColorStop(1, "hsla(12, 90%, 52%, 0)");
+          return gradient;
+        },
         fill: true,
         tension: 0.4,
-        pointRadius: 2,
-        pointHoverRadius: 5,
-        pointBackgroundColor: "hsl(270, 70%, 55%)",
-        borderWidth: 2,
+        pointRadius: 3,
+        pointHoverRadius: 6,
+        pointBackgroundColor: "hsl(25, 95%, 53%)",
+        pointBorderColor: "hsl(0, 0%, 8%)",
+        pointBorderWidth: 2,
+        borderWidth: 2.5,
       },
     ],
   };
@@ -41,29 +50,30 @@ const PriceChart = ({ labels, data }: PriceChartProps) => {
     maintainAspectRatio: false,
     plugins: {
       tooltip: {
-        backgroundColor: "hsl(240, 6%, 10%)",
-        titleColor: "hsl(0, 0%, 98%)",
-        bodyColor: "hsl(0, 0%, 98%)",
-        borderColor: "hsl(270, 70%, 55%)",
+        backgroundColor: "hsl(0, 0%, 8%)",
+        titleColor: "hsl(0, 0%, 95%)",
+        bodyColor: "hsl(25, 95%, 58%)",
+        borderColor: "hsl(12, 90%, 52%)",
         borderWidth: 1,
-        padding: 10,
+        padding: 12,
+        cornerRadius: 10,
+        titleFont: { family: "Space Grotesk", weight: "bold" as const, size: 11 },
+        bodyFont: { family: "Space Grotesk", weight: "bold" as const, size: 13 },
         callbacks: {
-          label: (ctx: any) => {
-            return `R$ ${ctx.parsed.y.toLocaleString("pt-BR")}`;
-          },
+          label: (ctx: any) => `R$ ${ctx.parsed.y.toLocaleString("pt-BR")}`,
         },
       },
     },
     scales: {
       x: {
-        grid: { color: "hsla(240, 4%, 16%, 0.5)" },
-        ticks: { color: "hsl(240, 5%, 64.9%)", font: { size: 10 } },
+        grid: { color: "hsla(0, 0%, 14%, 0.6)" },
+        ticks: { color: "hsl(0, 0%, 45%)", font: { size: 10, family: "Inter" } },
       },
       y: {
-        grid: { color: "hsla(240, 4%, 16%, 0.5)" },
+        grid: { color: "hsla(0, 0%, 14%, 0.6)" },
         ticks: {
-          color: "hsl(240, 5%, 64.9%)",
-          font: { size: 10 },
+          color: "hsl(0, 0%, 45%)",
+          font: { size: 10, family: "Inter" },
           callback: (v: any) => `R$ ${(v / 1000).toFixed(0)}k`,
         },
       },

@@ -1,40 +1,55 @@
 interface DealGaugeProps {
-  percentage: number; // 0 to 200 (percentage of FIPE price)
+  percentage: number;
   label: string;
   color: 'green' | 'yellow' | 'red';
 }
 
 const DealGauge = ({ percentage, label, color }: DealGaugeProps) => {
-  // Map 60-140% range to 0-180 degrees
   const clampedPerc = Math.max(60, Math.min(140, percentage));
   const angle = ((clampedPerc - 60) / 80) * 180;
 
   const colorMap = {
-    green: { stroke: 'hsl(145, 65%, 42%)', bg: 'hsl(145, 65%, 42%, 0.15)', text: 'text-accent' },
-    yellow: { stroke: 'hsl(38, 92%, 50%)', bg: 'hsl(38, 92%, 50%, 0.15)', text: 'text-warning' },
-    red: { stroke: 'hsl(0, 72%, 51%)', bg: 'hsl(0, 72%, 51%, 0.15)', text: 'text-destructive' },
+    green: { stroke: 'hsl(145, 65%, 42%)', text: 'text-success' },
+    yellow: { stroke: 'hsl(25, 95%, 53%)', text: 'text-accent' },
+    red: { stroke: 'hsl(0, 72%, 51%)', text: 'text-destructive' },
   };
 
   const c = colorMap[color];
 
   return (
     <div className="flex flex-col items-center">
-      <div className="relative w-48 h-28 overflow-hidden">
+      <div className="relative w-52 h-30 overflow-hidden">
         <svg viewBox="0 0 200 110" className="w-full h-full">
           {/* Background arc */}
           <path
             d="M 20 100 A 80 80 0 0 1 180 100"
             fill="none"
-            stroke="hsl(240, 4%, 16%)"
-            strokeWidth="14"
+            stroke="hsl(0, 0%, 14%)"
+            strokeWidth="16"
             strokeLinecap="round"
           />
-          {/* Green zone (80-120%) */}
+          {/* Red zone left */}
           <path
-            d="M 70 30 A 80 80 0 0 1 130 30"
+            d="M 20 100 A 80 80 0 0 1 55 40"
+            fill="none"
+            stroke="hsl(0, 72%, 51%, 0.3)"
+            strokeWidth="16"
+            strokeLinecap="round"
+          />
+          {/* Green zone center */}
+          <path
+            d="M 65 30 A 80 80 0 0 1 135 30"
             fill="none"
             stroke="hsl(145, 65%, 42%, 0.3)"
-            strokeWidth="14"
+            strokeWidth="16"
+            strokeLinecap="round"
+          />
+          {/* Orange zone right */}
+          <path
+            d="M 145 40 A 80 80 0 0 1 180 100"
+            fill="none"
+            stroke="hsl(25, 95%, 53%, 0.3)"
+            strokeWidth="16"
             strokeLinecap="round"
           />
           {/* Needle */}
@@ -49,18 +64,18 @@ const DealGauge = ({ percentage, label, color }: DealGaugeProps) => {
             className="transition-all duration-700 ease-out"
           />
           {/* Center dot */}
-          <circle cx="100" cy="100" r="6" fill={c.stroke} />
-          <circle cx="100" cy="100" r="3" fill="hsl(240, 6%, 10%)" />
-          
+          <circle cx="100" cy="100" r="7" fill={c.stroke} />
+          <circle cx="100" cy="100" r="3" fill="hsl(0, 0%, 8%)" />
+
           {/* Labels */}
-          <text x="15" y="108" fontSize="9" fill="hsl(0, 72%, 51%)" fontWeight="500">GOLPE</text>
-          <text x="85" y="20" fontSize="9" fill="hsl(145, 65%, 42%)" fontWeight="500">BOM</text>
-          <text x="155" y="108" fontSize="9" fill="hsl(38, 92%, 50%)" fontWeight="500">CARO</text>
+          <text x="8" y="108" fontSize="8" fill="hsl(0, 72%, 55%)" fontWeight="700" fontFamily="Space Grotesk">GOLPE</text>
+          <text x="83" y="18" fontSize="8" fill="hsl(145, 65%, 50%)" fontWeight="700" fontFamily="Space Grotesk">BOM</text>
+          <text x="153" y="108" fontSize="8" fill="hsl(25, 95%, 58%)" fontWeight="700" fontFamily="Space Grotesk">CARO</text>
         </svg>
       </div>
-      <div className="text-center -mt-2">
-        <p className={`text-2xl font-bold ${c.text}`}>{percentage.toFixed(0)}%</p>
-        <p className={`text-sm font-medium ${c.text}`}>{label}</p>
+      <div className="text-center -mt-1">
+        <p className={`text-3xl font-extrabold font-display ${c.text}`}>{percentage.toFixed(0)}%</p>
+        <p className={`text-xs font-bold uppercase tracking-widest ${c.text}`}>{label}</p>
       </div>
     </div>
   );

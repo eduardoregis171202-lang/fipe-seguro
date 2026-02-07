@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Search, Share2, AlertCircle } from "lucide-react";
+import { Search, Share2, AlertCircle, ChevronDown, TrendingUp } from "lucide-react";
 import {
   fetchMarcas, fetchModelos, fetchAnos, fetchPreco,
   parseFipeValue, formatCurrency, generateSimulatedHistory, generateWhatsAppShareText,
@@ -26,7 +26,6 @@ const PesquisaTab = () => {
   const [loadingPreco, setLoadingPreco] = useState(false);
   const [error, setError] = useState("");
 
-  // Load marcas on mount
   useEffect(() => {
     setLoadingMarcas(true);
     setError("");
@@ -36,7 +35,6 @@ const PesquisaTab = () => {
       .finally(() => setLoadingMarcas(false));
   }, []);
 
-  // Load modelos when marca changes
   useEffect(() => {
     if (!selectedMarca) { setModelos([]); return; }
     setSelectedModelo("");
@@ -51,7 +49,6 @@ const PesquisaTab = () => {
       .finally(() => setLoadingModelos(false));
   }, [selectedMarca]);
 
-  // Load anos when modelo changes
   useEffect(() => {
     if (!selectedMarca || !selectedModelo) { setAnos([]); return; }
     setSelectedAno("");
@@ -88,7 +85,7 @@ const PesquisaTab = () => {
   };
 
   const SelectField = ({
-    label, value, onChange, options, loading, disabled
+    label, value, onChange, options, loading, disabled, icon
   }: {
     label: string;
     value: string;
@@ -96,59 +93,66 @@ const PesquisaTab = () => {
     options: { value: string; label: string }[];
     loading: boolean;
     disabled: boolean;
+    icon?: string;
   }) => (
     <div>
-      <label className="text-xs font-medium text-muted-foreground mb-1.5 block">{label}</label>
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        disabled={disabled || loading}
-        className="w-full h-12 px-3 rounded-xl bg-secondary text-foreground border border-border text-sm focus:outline-none focus:ring-2 focus:ring-primary disabled:opacity-40 appearance-none cursor-pointer"
-      >
-        <option value="">
-          {loading ? "Carregando..." : `Selecione ${label.toLowerCase()}`}
-        </option>
-        {options.map(o => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
+      <label className="text-xs font-semibold text-muted-foreground mb-1.5 block uppercase tracking-wider">
+        {icon} {label}
+      </label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          disabled={disabled || loading}
+          className="w-full h-13 px-4 pr-10 rounded-xl bg-secondary text-foreground border border-border text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary disabled:opacity-30 appearance-none cursor-pointer transition-all"
+          style={{ height: '52px' }}
+        >
+          <option value="">
+            {loading ? "Carregando..." : `Selecione`}
+          </option>
+          {options.map(o => (
+            <option key={o.value} value={o.value}>{o.label}</option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      </div>
     </div>
   );
 
   return (
     <div className="space-y-5">
-      <div className="glass-card rounded-xl p-4 space-y-3">
-        <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">Scanner de Mercado</h2>
-        
+      {/* Search Form */}
+      <div className="glass-card rounded-2xl p-5 space-y-4">
+        <div className="flex items-center gap-2 mb-1">
+          <div className="w-8 h-8 rounded-lg gradient-primary flex items-center justify-center">
+            <Search className="w-4 h-4 text-primary-foreground" />
+          </div>
+          <h2 className="text-sm font-bold font-display text-foreground">Scanner de Mercado</h2>
+        </div>
+
         <SelectField
-          label="Marca"
-          value={selectedMarca}
-          onChange={setSelectedMarca}
+          label="Marca" icon="🏭"
+          value={selectedMarca} onChange={setSelectedMarca}
           options={marcas.map(m => ({ value: m.codigo, label: m.nome }))}
-          loading={loadingMarcas}
-          disabled={false}
+          loading={loadingMarcas} disabled={false}
         />
         <SelectField
-          label="Modelo"
-          value={selectedModelo}
-          onChange={setSelectedModelo}
+          label="Modelo" icon="🚗"
+          value={selectedModelo} onChange={setSelectedModelo}
           options={modelos.map(m => ({ value: String(m.codigo), label: m.nome }))}
-          loading={loadingModelos}
-          disabled={!selectedMarca}
+          loading={loadingModelos} disabled={!selectedMarca}
         />
         <SelectField
-          label="Ano"
-          value={selectedAno}
-          onChange={setSelectedAno}
+          label="Ano" icon="📅"
+          value={selectedAno} onChange={setSelectedAno}
           options={anos.map(a => ({ value: a.codigo, label: a.nome }))}
-          loading={loadingAnos}
-          disabled={!selectedModelo}
+          loading={loadingAnos} disabled={!selectedModelo}
         />
 
         <button
           onClick={handleSearch}
           disabled={!selectedAno || loadingPreco}
-          className="w-full py-3.5 rounded-xl gradient-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98] disabled:opacity-50"
+          className="w-full py-4 rounded-xl gradient-primary text-primary-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97] disabled:opacity-40 glow-primary"
         >
           <Search className="w-4 h-4" />
           Consultar Preço FIPE
@@ -157,9 +161,9 @@ const PesquisaTab = () => {
 
       {/* Error */}
       {error && (
-        <div className="flex items-center gap-2 p-3 rounded-xl bg-destructive/10 border border-destructive/20">
+        <div className="flex items-center gap-2.5 p-4 rounded-xl bg-destructive/10 border border-destructive/30">
           <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
-          <p className="text-xs text-destructive">{error}</p>
+          <p className="text-xs text-destructive font-medium">{error}</p>
         </div>
       )}
 
@@ -169,30 +173,49 @@ const PesquisaTab = () => {
       {/* Result */}
       {resultado && !loadingPreco && (
         <div className="animate-in fade-in-0 slide-in-from-bottom-4 duration-300 space-y-4">
-          <div className="glass-card rounded-xl p-5">
-            <p className="text-xs text-muted-foreground mb-1">Resultado da consulta</p>
-            <h3 className="font-bold text-foreground">{resultado.Marca} {resultado.Modelo}</h3>
-            <p className="text-xs text-muted-foreground mt-0.5">
-              Ano: {resultado.AnoModelo} · {resultado.Combustivel} · Ref: {resultado.MesReferencia}
-            </p>
-            <p className="text-3xl font-bold text-gradient mt-3">{resultado.Valor}</p>
-            <p className="text-[10px] text-muted-foreground mt-1">Código FIPE: {resultado.CodigoFipe}</p>
+          {/* Price Card */}
+          <div className="rounded-2xl overflow-hidden">
+            <div className="gradient-primary p-5 pb-4">
+              <p className="text-xs text-primary-foreground/70 font-medium">Resultado da consulta</p>
+              <h3 className="font-bold text-primary-foreground text-lg font-display mt-1">
+                {resultado.Marca} {resultado.Modelo}
+              </h3>
+              <p className="text-xs text-primary-foreground/60 mt-0.5">
+                Ano: {resultado.AnoModelo} · {resultado.Combustivel}
+              </p>
+            </div>
+            <div className="glass-card border-t-0 rounded-t-none p-5">
+              <div className="flex items-end justify-between">
+                <div>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Valor FIPE</p>
+                  <p className="text-3xl font-extrabold text-gradient font-display mt-1">{resultado.Valor}</p>
+                </div>
+                <div className="text-right">
+                  <p className="text-[10px] text-muted-foreground">Ref: {resultado.MesReferencia}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">Cód: {resultado.CodigoFipe}</p>
+                </div>
+              </div>
 
-            <button
-              onClick={handleShare}
-              className="mt-4 w-full py-3 rounded-xl bg-accent text-accent-foreground font-semibold text-sm flex items-center justify-center gap-2 transition-transform active:scale-[0.98]"
-            >
-              <Share2 className="w-4 h-4" />
-              Compartilhar no WhatsApp
-            </button>
+              <button
+                onClick={handleShare}
+                className="mt-5 w-full py-3.5 rounded-xl bg-accent text-accent-foreground font-bold text-sm flex items-center justify-center gap-2 transition-all active:scale-[0.97] glow-accent"
+              >
+                <Share2 className="w-4 h-4" />
+                Compartilhar no WhatsApp
+              </button>
+            </div>
           </div>
 
           {/* Chart */}
           {chartData && (
-            <div className="glass-card rounded-xl p-4">
-              <h3 className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wider">
-                Histórico de preços (simulado)
-              </h3>
+            <div className="glass-card rounded-2xl p-5">
+              <div className="flex items-center gap-2 mb-4">
+                <TrendingUp className="w-4 h-4 text-accent" />
+                <h3 className="text-xs font-bold font-display text-foreground uppercase tracking-wider">
+                  Histórico de preços
+                </h3>
+                <span className="ml-auto text-[9px] text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">simulado</span>
+              </div>
               <PriceChart labels={chartData.labels} data={chartData.data} />
             </div>
           )}
