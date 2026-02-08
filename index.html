@@ -503,6 +503,42 @@
             <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.5"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></div>
             <div><div class="card-title font-display">Custo de Propriedade</div><div class="card-subtitle">Quanto custa manter seu carro por mês</div></div>
           </div>
+
+          <!-- FIPE Vehicle Selectors -->
+          <div>
+            <label class="form-label">🏭 Marca</label>
+            <div class="select-wrapper">
+              <select id="custoMarca" class="form-select"><option value="">Carregando...</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">🚗 Modelo</label>
+            <div class="select-wrapper">
+              <select id="custoModelo" class="form-select" disabled><option value="">Selecione</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">📅 Ano</label>
+            <div class="select-wrapper">
+              <select id="custoAno" class="form-select" disabled><option value="">Selecione</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+          <button id="btnBuscarCustoFipe" class="btn-primary gradient-primary glow-primary" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            Buscar Valor FIPE
+          </button>
+          <div id="custoFipeLoading" class="spinner-wrap" style="display:none">
+            <div class="spinner"><div class="ring1"></div><div class="ring2"></div><div class="ring3"></div></div>
+            <p class="text-muted" style="font-size:14px;font-weight:500">Buscando valor FIPE...</p>
+          </div>
+          <div id="custoFipeInfo" style="display:none" class="fade-in"></div>
+
+          <!-- Divider -->
+          <div class="ember-line" style="border-radius:999px;margin:4px 0"></div>
+
           <div>
             <label class="form-label">💰 Valor FIPE (R$)</label>
             <input id="custoValorFipe" type="text" inputmode="numeric" placeholder="Ex: 50.000" class="form-input" />
@@ -1280,6 +1316,116 @@
       const fipeInput = $('#custoValorFipe');
       fipeInput.addEventListener('input', () => { fipeInput.value = formatNumInput(fipeInput.value); });
 
+      // ─── FIPE selectors for Custo tab ───
+      const custoMarca = $('#custoMarca');
+      const custoModelo = $('#custoModelo');
+      const custoAno = $('#custoAno');
+      const btnBuscarFipe = $('#btnBuscarCustoFipe');
+      const custoFipeLoading = $('#custoFipeLoading');
+      const custoFipeInfo = $('#custoFipeInfo');
+
+      // Load marcas into custo tab
+      async function loadCustoMarcas() {
+        try {
+          const res = await fetch(FIPE_API + '/carros/marcas');
+          const data = await res.json();
+          custoMarca.innerHTML = '<option value="">Selecione a marca</option>';
+          data.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.codigo; opt.textContent = m.nome;
+            custoMarca.appendChild(opt);
+          });
+        } catch { custoMarca.innerHTML = '<option value="">Erro ao carregar</option>'; }
+      }
+      loadCustoMarcas();
+
+      custoMarca.addEventListener('change', async () => {
+        const marcaId = custoMarca.value;
+        custoModelo.innerHTML = '<option value="">Carregando...</option>';
+        custoModelo.disabled = true;
+        custoAno.innerHTML = '<option value="">Selecione</option>';
+        custoAno.disabled = true;
+        btnBuscarFipe.disabled = true;
+        custoFipeInfo.style.display = 'none';
+        if (!marcaId) { custoModelo.innerHTML = '<option value="">Selecione</option>'; return; }
+        try {
+          const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos');
+          const data = await res.json();
+          custoModelo.innerHTML = '<option value="">Selecione o modelo</option>';
+          data.modelos.forEach(m => {
+            const opt = document.createElement('option');
+            opt.value = m.codigo; opt.textContent = m.nome;
+            custoModelo.appendChild(opt);
+          });
+          custoModelo.disabled = false;
+        } catch { custoModelo.innerHTML = '<option value="">Erro ao carregar</option>'; }
+      });
+
+      custoModelo.addEventListener('change', async () => {
+        const marcaId = custoMarca.value, modeloId = custoModelo.value;
+        custoAno.innerHTML = '<option value="">Carregando...</option>';
+        custoAno.disabled = true;
+        btnBuscarFipe.disabled = true;
+        custoFipeInfo.style.display = 'none';
+        if (!modeloId) { custoAno.innerHTML = '<option value="">Selecione</option>'; return; }
+        try {
+          const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos/' + modeloId + '/anos');
+          const data = await res.json();
+          custoAno.innerHTML = '<option value="">Selecione o ano</option>';
+          data.forEach(a => {
+            const opt = document.createElement('option');
+            opt.value = a.codigo; opt.textContent = a.nome;
+            custoAno.appendChild(opt);
+          });
+          custoAno.disabled = false;
+        } catch { custoAno.innerHTML = '<option value="">Erro ao carregar</option>'; }
+      });
+
+      custoAno.addEventListener('change', () => {
+        btnBuscarFipe.disabled = !custoAno.value;
+        custoFipeInfo.style.display = 'none';
+      });
+
+      btnBuscarFipe.addEventListener('click', async () => {
+        const marcaId = custoMarca.value, modeloId = custoModelo.value, anoId = custoAno.value;
+        if (!marcaId || !modeloId || !anoId) return;
+        custoFipeLoading.style.display = 'flex';
+        custoFipeInfo.style.display = 'none';
+        try {
+          const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos/' + modeloId + '/anos/' + anoId);
+          const preco = await res.json();
+          const valorNum = parseFipeValue(preco.Valor);
+
+          // Auto-fill valor FIPE
+          fipeInput.value = formatNumInput(String(Math.round(valorNum)));
+
+          // Auto-fill idade
+          const currentYear = new Date().getFullYear();
+          const idade = Math.max(0, currentYear - preco.AnoModelo);
+          $('#custoIdade').value = String(idade);
+
+          // Show info card
+          custoFipeInfo.innerHTML = `
+            <div style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:hsl(var(--success)/0.08);border:1px solid hsl(var(--success)/0.25)">
+              <span style="font-size:20px">✅</span>
+              <div style="flex:1;min-width:0">
+                <p style="font-size:12px;font-weight:700;color:hsl(var(--success))">${preco.Marca} ${preco.Modelo}</p>
+                <p style="font-size:11px;color:hsl(var(--muted-foreground))">Ano ${preco.AnoModelo} · ${preco.Combustivel} · FIPE: <strong style="color:hsl(var(--foreground))">${preco.Valor}</strong></p>
+              </div>
+            </div>`;
+          custoFipeInfo.style.display = 'block';
+        } catch {
+          custoFipeInfo.innerHTML = `
+            <div style="display:flex;align-items:center;gap:10px;padding:14px;border-radius:12px;background:hsl(var(--destructive)/0.08);border:1px solid hsl(var(--destructive)/0.25)">
+              <span style="font-size:16px">❌</span>
+              <p style="font-size:12px;font-weight:500;color:hsl(var(--destructive))">Erro ao buscar valor FIPE. Tente novamente.</p>
+            </div>`;
+          custoFipeInfo.style.display = 'block';
+        }
+        custoFipeLoading.style.display = 'none';
+      });
+
+      // ─── Calculate cost ───
       $('#btnCalcularCusto').addEventListener('click', () => {
         const fipe = Number(fipeInput.value.replace(/\D/g,''));
         const km = Number($('#custoKm').value);
