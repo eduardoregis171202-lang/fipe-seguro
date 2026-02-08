@@ -1305,6 +1305,65 @@
     // ══════════════════════════════════════════
     // ═══ CUSTO TAB LOGIC ═══
     // ══════════════════════════════════════════
+    // ─── Vehicle category mapping for smarter cost estimates ───
+    const MARCA_CATEGORIAS = {
+      // Premium / Luxo
+      premium: ['BMW','MERCEDES-BENZ','AUDI','VOLVO','LEXUS','JAGUAR','LAND ROVER','PORSCHE','MASERATI','ALFA ROMEO','MINI','INFINITI','LINCOLN','CADILLAC'],
+      // Importadas populares
+      importada: ['TOYOTA','HONDA','HYUNDAI','KIA','NISSAN','MITSUBISHI','SUBARU','SUZUKI','CHERY','JAC','LIFAN','CAOA CHERY','BYD','GWM','HAVAL'],
+      // Nacionais / populares
+      popular: ['FIAT','VOLKSWAGEN','CHEVROLET','RENAULT','PEUGEOT','CITROËN','FORD']
+    };
+
+    function getCategoriaMarca(marcaNome) {
+      if (!marcaNome) return 'popular';
+      const upper = marcaNome.toUpperCase();
+      if (MARCA_CATEGORIAS.premium.some(m => upper.includes(m))) return 'premium';
+      if (MARCA_CATEGORIAS.importada.some(m => upper.includes(m))) return 'importada';
+      return 'popular';
+    }
+
+    // IPVA exemption rules by state (age in years for full exemption)
+    const IPVA_ISENCAO = {
+      SP:20, MG:100, RJ:15, RS:20, PR:20, SC:30, BA:15, PE:30, CE:15,
+      GO:15, DF:15, PA:15, MA:15, ES:15, MT:18, MS:20, AM:15, PI:15,
+      AL:15, SE:15, RN:10, PB:15, RO:15, TO:15, AC:20, AP:10, RR:10
+    };
+
+    function calcIPVA(fipe, aliquota, idade, uf) {
+      // Check exemption
+      const limiteIsencao = IPVA_ISENCAO[uf] || 20;
+      if (idade >= limiteIsencao) return 0;
+      // Some states give 50% discount for vehicles near exemption age
+      const desconto = (idade >= limiteIsencao - 5 && limiteIsencao <= 20) ? 0.5 : 1;
+      return (fipe * (aliquota / 100) * desconto) / 12;
+    }
+
+    function calcSeguro(fipe, idade, categoria) {
+      // Base rates by category (annual % of FIPE value)
+      const taxasBase = {
+        popular:   { novo: 0.035, medio: 0.045, velho: 0.055 },
+        importada: { novo: 0.045, medio: 0.055, velho: 0.065 },
+        premium:   { novo: 0.060, medio: 0.075, velho: 0.090 }
+      };
+      const faixa = idade <= 3 ? 'novo' : idade <= 8 ? 'medio' : 'velho';
+      const taxa = (taxasBase[categoria] || taxasBase.popular)[faixa];
+      return (fipe * taxa) / 12;
+    }
+
+    function calcManutencao(idade, categoria) {
+      // Monthly maintenance estimates by category and age
+      const custos = {
+        popular:   { novo: 120, medio: 250, velho: 400 },
+        importada: { novo: 200, medio: 380, velho: 550 },
+        premium:   { novo: 350, medio: 600, velho: 900 }
+      };
+      const faixa = idade <= 3 ? 'novo' : idade <= 8 ? 'medio' : 'velho';
+      return (custos[categoria] || custos.popular)[faixa];
+    }
+
+    let custoVeiculoInfo = null; // stores fetched vehicle data
+
     function initCusto() {
       const sel = $('#custoEstado');
       ESTADOS_IPVA.forEach(e => {
@@ -1347,6 +1406,7 @@
         custoAno.disabled = true;
         btnBuscarFipe.disabled = true;
         custoFipeInfo.style.display = 'none';
+        custoVeiculoInfo = null;
         if (!marcaId) { custoModelo.innerHTML = '<option value="">Selecione</option>'; return; }
         try {
           const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos');
@@ -1367,6 +1427,7 @@
         custoAno.disabled = true;
         btnBuscarFipe.disabled = true;
         custoFipeInfo.style.display = 'none';
+        custoVeiculoInfo = null;
         if (!modeloId) { custoAno.innerHTML = '<option value="">Selecione</option>'; return; }
         try {
           const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos/' + modeloId + '/anos');
@@ -1384,6 +1445,7 @@
       custoAno.addEventListener('change', () => {
         btnBuscarFipe.disabled = !custoAno.value;
         custoFipeInfo.style.display = 'none';
+        custoVeiculoInfo = null;
       });
 
       btnBuscarFipe.addEventListener('click', async () => {
@@ -1395,26 +1457,40 @@
           const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos/' + modeloId + '/anos/' + anoId);
           const preco = await res.json();
           const valorNum = parseFipeValue(preco.Valor);
-
-          // Auto-fill valor FIPE
-          fipeInput.value = formatNumInput(String(Math.round(valorNum)));
-
-          // Auto-fill idade
           const currentYear = new Date().getFullYear();
           const idade = Math.max(0, currentYear - preco.AnoModelo);
+          const categoria = getCategoriaMarca(preco.Marca);
+
+          // Store vehicle info for smarter calculations
+          custoVeiculoInfo = {
+            marca: preco.Marca,
+            modelo: preco.Modelo,
+            ano: preco.AnoModelo,
+            combustivel: preco.Combustivel,
+            valor: valorNum,
+            idade: idade,
+            categoria: categoria
+          };
+
+          // Auto-fill valor FIPE and idade
+          fipeInput.value = formatNumInput(String(Math.round(valorNum)));
           $('#custoIdade').value = String(idade);
 
-          // Show info card
+          const catLabel = categoria === 'premium' ? '🏆 Premium' : categoria === 'importada' ? '🌍 Importado' : '🇧🇷 Nacional';
+
+          // Show info card with category
           custoFipeInfo.innerHTML = `
             <div style="display:flex;align-items:center;gap:12px;padding:14px;border-radius:12px;background:hsl(var(--success)/0.08);border:1px solid hsl(var(--success)/0.25)">
               <span style="font-size:20px">✅</span>
               <div style="flex:1;min-width:0">
                 <p style="font-size:12px;font-weight:700;color:hsl(var(--success))">${preco.Marca} ${preco.Modelo}</p>
                 <p style="font-size:11px;color:hsl(var(--muted-foreground))">Ano ${preco.AnoModelo} · ${preco.Combustivel} · FIPE: <strong style="color:hsl(var(--foreground))">${preco.Valor}</strong></p>
+                <p style="font-size:10px;color:hsl(var(--muted-foreground));margin-top:2px">Categoria: <strong style="color:hsl(var(--accent))">${catLabel}</strong> · Idade: ${idade} ano${idade!==1?'s':''}</p>
               </div>
             </div>`;
           custoFipeInfo.style.display = 'block';
         } catch {
+          custoVeiculoInfo = null;
           custoFipeInfo.innerHTML = `
             <div style="display:flex;align-items:center;gap:10px;padding:14px;border-radius:12px;background:hsl(var(--destructive)/0.08);border:1px solid hsl(var(--destructive)/0.25)">
               <span style="font-size:16px">❌</span>
@@ -1425,21 +1501,41 @@
         custoFipeLoading.style.display = 'none';
       });
 
-      // ─── Calculate cost ───
+      // ─── Calculate cost (smart) ───
       $('#btnCalcularCusto').addEventListener('click', () => {
         const fipe = Number(fipeInput.value.replace(/\D/g,''));
         const km = Number($('#custoKm').value);
         const cons = Number($('#custoConsumo').value.replace(',','.'));
         const preco = Number($('#custoPrecoComb').value.replace(',','.'));
         const idade = Number($('#custoIdade').value);
-        const aliquota = ESTADOS_IPVA.find(e=>e.uf===sel.value)?.aliquota || 4;
+        const uf = sel.value;
+        const aliquota = ESTADOS_IPVA.find(e=>e.uf===uf)?.aliquota || 4;
         if (!fipe || !km || !cons || !preco) return;
 
-        const ipva = (fipe * (aliquota/100)) / 12;
-        const seguro = (fipe * (idade>10?0.06:idade>5?0.05:0.04)) / 12;
+        // Use vehicle category if available, otherwise estimate from value
+        const categoria = custoVeiculoInfo ? custoVeiculoInfo.categoria 
+          : (fipe > 150000 ? 'premium' : fipe > 80000 ? 'importada' : 'popular');
+
+        const ipva = calcIPVA(fipe, aliquota, idade, uf);
+        const seguro = calcSeguro(fipe, idade, categoria);
         const combustivel = (km / cons) * preco;
-        const manutencao = idade>10?450:idade>5?300:180;
+        const manutencao = calcManutencao(idade, categoria);
         const total = ipva + seguro + combustivel + manutencao;
+
+        // Build detail notes
+        const limiteIsencao = IPVA_ISENCAO[uf] || 20;
+        const ipvaNote = ipva === 0 
+          ? `Isento de IPVA em ${uf} (veículos com ${limiteIsencao}+ anos)` 
+          : (idade >= limiteIsencao - 5 && limiteIsencao <= 20) 
+            ? `IPVA com 50% de desconto em ${uf} (próximo da isenção)` 
+            : `Alíquota ${aliquota}% em ${uf}`;
+        const catLabel = categoria === 'premium' ? 'Premium' : categoria === 'importada' ? 'Importado' : 'Nacional/Popular';
+        const seguroNote = `Estimativa para veículo ${catLabel}, ${idade <= 3 ? 'novo' : idade <= 8 ? 'seminovo' : 'usado'}`;
+        const manutNote = `Manutenção estimada para ${catLabel} com ${idade} ano${idade!==1?'s':''}`;
+
+        const veiculoHeader = custoVeiculoInfo 
+          ? `<p style="font-size:11px;opacity:0.7;margin-top:2px">${custoVeiculoInfo.marca} ${custoVeiculoInfo.modelo} · ${custoVeiculoInfo.ano}</p>` 
+          : '';
 
         const area = $('#custoResultArea');
         area.innerHTML = `
@@ -1448,21 +1544,31 @@
               <p class="label">Custo mensal total</p>
               <p class="value font-display">${formatCurrency(Math.round(total))}</p>
               <p class="sub">${formatCurrency(Math.round(total*12))}/ano</p>
+              ${veiculoHeader}
             </div>
           </div>
           <div class="glass-card card-section space-y-sm" style="padding:20px">
-            ${renderCostBar('Combustível','⛽',Math.round(combustivel),Math.round(total),'gradient-warning')}
-            ${renderCostBar('IPVA','💲',Math.round(ipva),Math.round(total),'gradient-primary')}
-            ${renderCostBar('Seguro','🛡️',Math.round(seguro),Math.round(total),'gradient-danger')}
-            ${renderCostBar('Manutenção','🔧',manutencao,Math.round(total),'bg-muted-fg')}
+            <div style="margin-bottom:4px">
+              <p style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.05em;color:hsl(var(--muted-foreground))">Detalhamento por categoria: <span style="color:hsl(var(--accent))">${catLabel}</span></p>
+            </div>
+            ${renderCostBarSmart('Combustível','⛽',Math.round(combustivel),Math.round(total),'gradient-warning', km+'km/mês · '+cons+'km/l')}
+            ${renderCostBarSmart('IPVA','💲',Math.round(ipva),Math.round(total),'gradient-primary', ipvaNote)}
+            ${renderCostBarSmart('Seguro','🛡️',Math.round(seguro),Math.round(total),'gradient-danger', seguroNote)}
+            ${renderCostBarSmart('Manutenção','🔧',Math.round(manutencao),Math.round(total),'bg-muted-fg', manutNote)}
           </div>
           <div class="glass-card tip-card">
-            <p class="tip-title">💡 Dica</p>
-            <p class="tip-text">${combustivel > total*0.5
-              ? 'Combustível é mais da metade do custo. Considere um carro mais econômico ou com motor flex.'
-              : seguro > ipva
-              ? 'Seguro está caro. Pesquise em diferentes seguradoras e considere rastreador para desconto.'
-              : 'Distribuição de custos equilibrada. Mantenha as revisões em dia para evitar surpresas!'}</p>
+            <p class="tip-title">💡 Dica personalizada</p>
+            <p class="tip-text">${
+              ipva === 0 
+                ? '🎉 Seu veículo é isento de IPVA em ' + uf + '! Isso já reduz bastante o custo de propriedade.'
+                : combustivel > total * 0.5
+                ? 'Combustível é mais da metade do custo. Considere um carro mais econômico ou com motor flex.'
+                : categoria === 'premium' && manutencao > 500
+                ? '⚠️ Veículos premium têm manutenção cara. Prefira oficinas especializadas independentes para economizar até 40%.'
+                : seguro > ipva
+                ? 'Seguro está relativamente alto. Pesquise em diferentes seguradoras e considere rastreador para desconto.'
+                : 'Distribuição de custos equilibrada. Mantenha as revisões em dia para evitar surpresas!'
+            }</p>
           </div>`;
         area.style.display = 'block';
       });
@@ -1483,6 +1589,27 @@
               <div class="cost-bar-fill ${colorClass !== 'bg-muted-fg' ? colorClass : ''}" style="width:${pct}%;${bgClass}"></div>
             </div>
           </div>
+        </div>`;
+    }
+
+    function renderCostBarSmart(label, icon, value, total, colorClass, note) {
+      const pct = total > 0 ? (value / total) * 100 : 0;
+      const bgClass = colorClass === 'bg-muted-fg' ? 'background:hsl(var(--muted-foreground))' : '';
+      return `
+        <div class="cost-row" style="flex-direction:column;align-items:stretch;gap:4px">
+          <div style="display:flex;align-items:center;gap:12px">
+            <div class="cost-icon"><span style="font-size:16px">${icon}</span></div>
+            <div class="cost-bar-wrap">
+              <div class="cost-bar-top">
+                <span class="cost-bar-label">${label}${value === 0 ? ' <span style="font-size:10px;color:hsl(var(--success));font-weight:700">ISENTO</span>' : ''}</span>
+                <span class="cost-bar-value font-display">${formatCurrency(value)}/mês</span>
+              </div>
+              <div class="cost-bar">
+                <div class="cost-bar-fill ${colorClass !== 'bg-muted-fg' ? colorClass : ''}" style="width:${pct}%;${bgClass}"></div>
+              </div>
+            </div>
+          </div>
+          ${note ? '<p style="font-size:10px;color:hsl(var(--muted-foreground));margin-left:44px;line-height:1.4">'+note+'</p>' : ''}
         </div>`;
     }
 
