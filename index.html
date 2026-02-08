@@ -121,10 +121,11 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid hsl(var(--border) / 0.4);
-      padding: 12px 16px 0;
+      padding: 16px 20px 0;
+      padding-top: calc(env(safe-area-inset-top, 0px) + 16px);
     }
     .header-inner { max-width: 512px; margin: 0 auto; }
-    .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .header-top { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; }
     .logo-box {
       width: 40px; height: 40px; border-radius: 12px;
       display: flex; align-items: center; justify-content: center;
@@ -141,7 +142,7 @@
 
     /* ─── Tab Bar ─── */
     .tab-bar {
-      display: flex; gap: 4px; overflow-x: auto; padding-bottom: 8px;
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 10px;
       margin: 0 -4px; padding-left: 4px; padding-right: 4px;
       scrollbar-width: none; -ms-overflow-style: none;
     }
@@ -161,9 +162,10 @@
     .tab-btn svg { width: 18px; height: 18px; }
 
     /* ─── Main ─── */
-    main { flex: 1; padding: 20px 16px 32px; max-width: 512px; margin: 0 auto; width: 100%; }
+    main { flex: 1; padding: 24px 20px 40px; max-width: 512px; margin: 0 auto; width: 100%; }
     footer {
-      padding: 16px; border-top: 1px solid hsl(var(--border) / 0.3);
+      padding: 20px 20px; border-top: 1px solid hsl(var(--border) / 0.3);
+      padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
       text-align: center; font-size: 10px; color: hsl(var(--muted-foreground));
     }
     footer .inner { max-width: 512px; margin: 0 auto; }
@@ -171,9 +173,9 @@
     /* ─── Tabs content ─── */
     .tab-content { display: none; }
     .tab-content.active { display: block; }
-    .space-y > * + * { margin-top: 20px; }
-    .space-y-sm > * + * { margin-top: 12px; }
-    .space-y-xs > * + * { margin-top: 8px; }
+    .space-y > * + * { margin-top: 24px; }
+    .space-y-sm > * + * { margin-top: 16px; }
+    .space-y-xs > * + * { margin-top: 10px; }
 
     /* ─── Form Elements ─── */
     .form-label {
@@ -226,8 +228,8 @@
     .btn-accent:active { transform: scale(0.95); }
 
     /* ─── Cards ─── */
-    .card-section { border-radius: 16px; padding: 20px; }
-    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .card-section { border-radius: 16px; padding: 24px; }
+    .card-header { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
     .card-icon {
       width: 32px; height: 32px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center; flex-shrink: 0;
