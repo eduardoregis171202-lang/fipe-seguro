@@ -1,27 +1,1406 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>Fipe Scanner — Compre seu carro com segurança</title>
-    <meta name="description" content="Consulte a Tabela FIPE, simule financiamento, avalie negócios e compare carros. Tudo em um app gratuito." />
-    <meta name="author" content="Fipe Scanner" />
-    <meta name="theme-color" content="#e63312" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Fipe Scanner" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Fipe Scanner — Compre seu carro com segurança</title>
+  <meta name="description" content="Consulte a Tabela FIPE, simule financiamento, avalie negócios e compare carros. Tudo em um app gratuito." />
+  <meta name="author" content="Fipe Scanner" />
+  <meta name="theme-color" content="#e63312" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Fipe Scanner" />
+  <meta property="og:title" content="Fipe Scanner — Compre seu carro com segurança" />
+  <meta property="og:description" content="Consulte a Tabela FIPE, simule financiamento, avalie negócios e compare carros." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+  <style>
+    /* ─── CSS Reset ─── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; border: 0 solid hsl(var(--border)); }
 
-    <meta property="og:title" content="Fipe Scanner — Compre seu carro com segurança" />
-    <meta property="og:description" content="Consulte a Tabela FIPE, simule financiamento, avalie negócios e compare carros." />
-    <meta property="og:type" content="website" />
+    /* ─── CSS Variables: Light ─── */
+    :root {
+      --background: 0 0% 97%;
+      --foreground: 0 0% 10%;
+      --card: 0 0% 100%;
+      --card-foreground: 0 0% 10%;
+      --popover: 0 0% 100%;
+      --popover-foreground: 0 0% 10%;
+      --primary: 12 90% 52%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 0 0% 92%;
+      --secondary-foreground: 0 0% 20%;
+      --muted: 0 0% 90%;
+      --muted-foreground: 0 0% 45%;
+      --accent: 25 95% 53%;
+      --accent-foreground: 0 0% 100%;
+      --destructive: 0 72% 51%;
+      --destructive-foreground: 0 0% 100%;
+      --warning: 38 92% 50%;
+      --warning-foreground: 0 0% 8%;
+      --success: 145 65% 42%;
+      --success-foreground: 0 0% 100%;
+      --border: 0 0% 86%;
+      --input: 0 0% 86%;
+      --ring: 12 90% 52%;
+      --radius: 0.75rem;
+    }
 
-    <meta name="twitter:card" content="summary_large_image" />
+    /* ─── CSS Variables: Dark ─── */
+    .dark {
+      --background: 0 0% 4%;
+      --foreground: 0 0% 95%;
+      --card: 0 0% 8%;
+      --card-foreground: 0 0% 95%;
+      --popover: 0 0% 8%;
+      --popover-foreground: 0 0% 95%;
+      --primary: 12 90% 52%;
+      --primary-foreground: 0 0% 100%;
+      --secondary: 0 0% 12%;
+      --secondary-foreground: 0 0% 90%;
+      --muted: 0 0% 14%;
+      --muted-foreground: 0 0% 55%;
+      --accent: 25 95% 53%;
+      --accent-foreground: 0 0% 100%;
+      --destructive: 0 72% 51%;
+      --destructive-foreground: 0 0% 100%;
+      --warning: 38 92% 50%;
+      --warning-foreground: 0 0% 8%;
+      --success: 145 65% 42%;
+      --success-foreground: 0 0% 100%;
+      --border: 0 0% 14%;
+      --input: 0 0% 14%;
+      --ring: 12 90% 52%;
+      --radius: 0.75rem;
+    }
 
-    <link rel="manifest" href="/manifest.json" />
-  </head>
+    /* ─── Base ─── */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: hsl(var(--background));
+      color: hsl(var(--foreground));
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .font-display { font-family: 'Space Grotesk', sans-serif; }
 
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+    /* ─── Gradients & Effects ─── */
+    .gradient-primary { background: linear-gradient(135deg, hsl(0, 78%, 48%), hsl(25, 95%, 53%)); }
+    .gradient-success { background: linear-gradient(135deg, hsl(145, 65%, 38%), hsl(160, 55%, 32%)); }
+    .gradient-danger { background: linear-gradient(135deg, hsl(0, 72%, 45%), hsl(0, 78%, 38%)); }
+    .gradient-warning { background: linear-gradient(135deg, hsl(38, 92%, 50%), hsl(25, 85%, 45%)); }
+    .glow-primary { box-shadow: 0 0 25px hsl(12 90% 52% / 0.2), 0 0 60px hsl(12 90% 52% / 0.05); }
+    .glass-card {
+      background: hsl(var(--card) / 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid hsl(var(--border) / 0.6);
+    }
+    .text-gradient {
+      background: linear-gradient(135deg, hsl(0, 78%, 55%), hsl(25, 95%, 58%));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    .ember-line {
+      height: 2px;
+      background: linear-gradient(90deg, transparent, hsl(12, 90%, 52%), hsl(25, 95%, 53%), transparent);
+    }
+
+    /* ─── Layout ─── */
+    header {
+      position: sticky; top: 0; z-index: 40;
+      background: hsl(var(--background) / 0.9);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid hsl(var(--border) / 0.4);
+      padding: 12px 16px 0;
+    }
+    .header-inner { max-width: 512px; margin: 0 auto; }
+    .header-top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .logo-box {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .header-title { font-size: 18px; font-weight: 700; letter-spacing: -0.025em; line-height: 1.2; }
+    .header-subtitle { font-size: 10px; color: hsl(var(--muted-foreground)); margin-top: -2px; }
+    .theme-btn {
+      margin-left: auto; width: 36px; height: 36px; border-radius: 12px;
+      background: hsl(var(--secondary)); display: flex; align-items: center; justify-content: center;
+      color: hsl(var(--muted-foreground)); cursor: pointer; border: none; transition: color 0.2s;
+    }
+    .theme-btn:hover { color: hsl(var(--foreground)); }
+    .theme-btn:active { transform: scale(0.95); }
+
+    /* ─── Tab Bar ─── */
+    .tab-bar {
+      display: flex; gap: 4px; overflow-x: auto; padding-bottom: 8px;
+      margin: 0 -4px; padding-left: 4px; padding-right: 4px;
+      scrollbar-width: none; -ms-overflow-style: none;
+    }
+    .tab-bar::-webkit-scrollbar { display: none; }
+    .tab-btn {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 14px; border-radius: 12px;
+      font-size: 12px; font-weight: 600; white-space: nowrap;
+      cursor: pointer; border: none; transition: all 0.2s; flex-shrink: 0;
+      background: transparent; color: hsl(var(--muted-foreground));
+    }
+    .tab-btn:hover { color: hsl(var(--foreground)); background: hsl(var(--secondary)); }
+    .tab-btn:active { transform: scale(0.95); }
+    .tab-btn.active {
+      color: hsl(var(--primary-foreground));
+    }
+    .tab-btn svg { width: 18px; height: 18px; }
+
+    /* ─── Main ─── */
+    main { flex: 1; padding: 20px 16px 32px; max-width: 512px; margin: 0 auto; width: 100%; }
+    footer {
+      padding: 16px; border-top: 1px solid hsl(var(--border) / 0.3);
+      text-align: center; font-size: 10px; color: hsl(var(--muted-foreground));
+    }
+    footer .inner { max-width: 512px; margin: 0 auto; }
+
+    /* ─── Tabs content ─── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .space-y > * + * { margin-top: 20px; }
+    .space-y-sm > * + * { margin-top: 12px; }
+    .space-y-xs > * + * { margin-top: 8px; }
+
+    /* ─── Form Elements ─── */
+    .form-label {
+      font-size: 11px; font-weight: 600; text-transform: uppercase;
+      letter-spacing: 0.05em; color: hsl(var(--muted-foreground));
+      display: block; margin-bottom: 6px;
+    }
+    .form-input, .form-select {
+      width: 100%; height: 52px; padding: 0 16px;
+      border-radius: 12px; background: hsl(var(--secondary));
+      color: hsl(var(--foreground)); border: 1px solid hsl(var(--border));
+      font-size: 14px; font-weight: 500; font-family: inherit;
+      outline: none; transition: all 0.2s;
+    }
+    .form-input:focus, .form-select:focus { box-shadow: 0 0 0 2px hsl(var(--ring)); }
+    .form-input:disabled, .form-select:disabled { opacity: 0.3; }
+    .form-input::placeholder { color: hsl(var(--muted-foreground) / 0.5); }
+    .form-select { appearance: none; cursor: pointer; padding-right: 40px; }
+    .select-wrapper { position: relative; }
+    .select-arrow {
+      position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+      pointer-events: none; color: hsl(var(--muted-foreground));
+    }
+
+    /* ─── Buttons ─── */
+    .btn-primary {
+      width: 100%; height: 52px; border-radius: 12px;
+      color: hsl(var(--primary-foreground));
+      font-weight: 700; font-size: 14px; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-primary:active { transform: scale(0.97); }
+    .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-secondary {
+      flex: 1; height: 40px; border-radius: 12px;
+      background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground));
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-secondary:active { transform: scale(0.95); }
+    .btn-accent {
+      flex: 1; height: 40px; border-radius: 12px;
+      background: hsl(var(--accent)); color: hsl(var(--accent-foreground));
+      font-size: 12px; font-weight: 600; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-accent:active { transform: scale(0.95); }
+
+    /* ─── Cards ─── */
+    .card-section { border-radius: 16px; padding: 20px; }
+    .card-header { display: flex; align-items: center; gap: 8px; margin-bottom: 4px; }
+    .card-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .card-icon svg { width: 16px; height: 16px; color: hsl(var(--primary-foreground)); }
+    .card-title { font-size: 14px; font-weight: 700; color: hsl(var(--foreground)); }
+    .card-subtitle { font-size: 10px; color: hsl(var(--muted-foreground)); }
+
+    /* ─── Result Cards ─── */
+    .result-hero { border-radius: 16px; overflow: hidden; }
+    .result-hero-top { padding: 20px; }
+    .result-hero-top .label { font-size: 12px; opacity: 0.7; font-weight: 500; }
+    .result-hero-top .value { font-size: 32px; font-weight: 800; margin-top: 4px; }
+    .result-hero-top .sub { font-size: 12px; opacity: 0.6; margin-top: 4px; }
+    .result-detail { border-radius: 16px; padding: 20px; }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+    /* ─── Prazo buttons ─── */
+    .prazo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .prazo-btn {
+      padding: 10px; border-radius: 12px; font-size: 14px; font-weight: 700;
+      font-family: inherit; cursor: pointer; border: none; transition: all 0.2s;
+      background: hsl(var(--secondary)); color: hsl(var(--secondary-foreground));
+    }
+    .prazo-btn:active { transform: scale(0.95); }
+    .prazo-btn.active { color: hsl(var(--primary-foreground)); }
+
+    /* ─── Progress Bar ─── */
+    .progress-bar {
+      height: 12px; border-radius: 999px; overflow: hidden;
+      background: hsl(var(--secondary));
+    }
+    .progress-fill {
+      height: 100%; border-radius: 999px; transition: width 0.5s ease;
+    }
+
+    /* ─── Checklist ─── */
+    .check-item {
+      width: 100%; display: flex; align-items: flex-start; gap: 12px;
+      padding: 12px; border-radius: 12px; text-align: left;
+      cursor: pointer; border: none; background: transparent;
+      font-family: inherit; transition: all 0.2s;
+    }
+    .check-item:active { transform: scale(0.98); }
+    .check-item:hover { background: hsl(var(--secondary) / 0.5); }
+    .check-item.checked { background: hsl(var(--success) / 0.05); }
+    .check-item svg { width: 20px; height: 20px; flex-shrink: 0; margin-top: 2px; }
+    .check-item .text { font-size: 14px; line-height: 1.4; color: hsl(var(--foreground)); }
+    .check-item.checked .text { color: hsl(var(--muted-foreground)); text-decoration: line-through; }
+    .cat-header {
+      padding: 16px 16px 8px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .cat-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: hsl(var(--foreground)); }
+    .cat-badge {
+      font-size: 10px; font-weight: 700; padding: 2px 8px;
+      border-radius: 999px; background: hsl(var(--secondary)); color: hsl(var(--muted-foreground));
+    }
+    .cat-badge.done { background: hsl(var(--success) / 0.2); color: hsl(var(--success)); }
+
+    /* ─── Cost Bar ─── */
+    .cost-row { display: flex; align-items: center; gap: 12px; }
+    .cost-icon {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: hsl(var(--secondary)); display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .cost-bar-wrap { flex: 1; min-width: 0; }
+    .cost-bar-top { display: flex; justify-content: space-between; margin-bottom: 4px; }
+    .cost-bar-label { font-size: 12px; font-weight: 500; color: hsl(var(--foreground)); }
+    .cost-bar-value { font-size: 12px; font-weight: 700; color: hsl(var(--foreground)); }
+    .cost-bar { height: 8px; border-radius: 999px; overflow: hidden; background: hsl(var(--secondary)); }
+    .cost-bar-fill { height: 100%; border-radius: 999px; transition: width 0.7s ease; }
+
+    /* ─── Placa Input ─── */
+    .placa-input {
+      width: 100%; height: 56px; padding: 0 16px;
+      border-radius: 12px; background: hsl(var(--secondary));
+      color: hsl(var(--foreground)); border: 1px solid hsl(var(--border));
+      font-size: 18px; font-weight: 700; letter-spacing: 0.3em;
+      text-align: center; text-transform: uppercase;
+      font-family: 'Space Grotesk', sans-serif;
+      outline: none; transition: all 0.2s;
+    }
+    .placa-input:focus { box-shadow: 0 0 0 2px hsl(var(--ring)); }
+    .placa-input::placeholder { letter-spacing: normal; font-size: 14px; font-weight: 500; color: hsl(var(--muted-foreground) / 0.5); }
+
+    /* ─── Tip Card ─── */
+    .tip-card {
+      border-radius: 12px; padding: 16px;
+      border: 1px solid hsl(var(--accent) / 0.3);
+    }
+    .tip-title { font-size: 12px; font-weight: 600; color: hsl(var(--accent)); margin-bottom: 4px; }
+    .tip-text { font-size: 12px; color: hsl(var(--foreground) / 0.8); line-height: 1.6; }
+
+    /* ─── Error ─── */
+    .error-box {
+      display: flex; align-items: center; gap: 10px;
+      padding: 16px; border-radius: 12px;
+      background: hsl(var(--destructive) / 0.1); border: 1px solid hsl(var(--destructive) / 0.3);
+    }
+    .error-box svg { width: 16px; height: 16px; color: hsl(var(--destructive)); flex-shrink: 0; }
+    .error-box p { font-size: 12px; font-weight: 500; color: hsl(var(--destructive)); }
+
+    /* ─── Spinner ─── */
+    .spinner-wrap { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 48px 0; gap: 16px; }
+    .spinner { position: relative; width: 48px; height: 48px; }
+    .spinner .ring1 {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid hsl(var(--secondary));
+    }
+    .spinner .ring2 {
+      position: absolute; inset: 0; border-radius: 50%;
+      border: 2px solid transparent; border-top-color: hsl(var(--primary));
+      animation: spin 1s linear infinite;
+    }
+    .spinner .ring3 {
+      position: absolute; inset: 8px; border-radius: 50%;
+      border: 2px solid transparent; border-bottom-color: hsl(var(--accent));
+      animation: spin 0.8s linear infinite reverse;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ─── Info list ─── */
+    .info-list { list-style: none; }
+    .info-list li {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: 12px; color: hsl(var(--foreground) / 0.8); padding: 4px 0;
+    }
+    .info-list li span { flex-shrink: 0; }
+
+    /* ─── Gauge ─── */
+    .gauge-wrap { display: flex; flex-direction: column; align-items: center; }
+    .gauge-svg { width: 208px; height: 120px; overflow: hidden; }
+    .gauge-text { text-align: center; margin-top: -4px; }
+    .gauge-perc { font-size: 30px; font-weight: 800; }
+    .gauge-label { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; }
+
+    /* ─── Chart ─── */
+    .chart-wrap { width: 100%; height: 208px; }
+
+    /* ─── Animate in ─── */
+    .fade-in { animation: fadeSlideIn 0.3s ease forwards; }
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ─── Utility ─── */
+    .text-success { color: hsl(var(--success)); }
+    .text-destructive { color: hsl(var(--destructive)); }
+    .text-accent { color: hsl(var(--accent)); }
+    .text-primary { color: hsl(var(--primary)); }
+    .text-muted { color: hsl(var(--muted-foreground)); }
+    .text-fg { color: hsl(var(--foreground)); }
+    .bg-success-soft { background: hsl(var(--success) / 0.2); }
+    .bg-primary-soft { background: hsl(var(--primary) / 0.1); }
+    .bg-accent-soft { background: hsl(var(--accent) / 0.1); }
+    .bg-destructive-soft { background: hsl(var(--destructive) / 0.1); }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
+  </style>
+</head>
+<body>
+  <!-- ═══════════════ HEADER ═══════════════ -->
+  <header>
+    <div class="header-inner">
+      <div class="header-top">
+        <div class="logo-box gradient-primary glow-primary">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-2-3.87-2-5.5 0-2.37 2-4.5 4-4.5s4 2.13 4 4.5c0 1.63-.93 3.36-2 5.5-.5 1-1 1.62-1 3a2.5 2.5 0 0 0 2.5 2.5"/><path d="M12 22v-3"/></svg>
+        </div>
+        <div>
+          <h1 class="header-title font-display text-gradient">Fipe Scanner</h1>
+          <p class="header-subtitle">Compre seu carro com segurança</p>
+        </div>
+        <button class="theme-btn" id="themeToggle" aria-label="Alternar tema">
+          <!-- sun icon (shown in dark mode) -->
+          <svg id="iconSun" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+          <!-- moon icon (shown in light mode) -->
+          <svg id="iconMoon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg>
+        </button>
+      </div>
+
+      <!-- Tab Bar -->
+      <div class="tab-bar" id="tabBar">
+        <button class="tab-btn active gradient-primary glow-primary" data-tab="cotacao">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg>
+          Cotação
+        </button>
+        <button class="tab-btn" data-tab="vistoria">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg>
+          Vistoria
+        </button>
+        <button class="tab-btn" data-tab="custo">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.5"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg>
+          Custo
+        </button>
+        <button class="tab-btn" data-tab="detran">
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg>
+          Detran
+        </button>
+      </div>
+      <div class="ember-line" style="border-radius:999px"></div>
+    </div>
+  </header>
+
+  <!-- ═══════════════ MAIN ═══════════════ -->
+  <main>
+    <!-- ═══ COTAÇÃO TAB ═══ -->
+    <section id="tab-cotacao" class="tab-content active">
+      <div class="space-y">
+        <!-- FIPE Search -->
+        <div class="glass-card card-section space-y-sm" style="padding:20px">
+          <div class="card-header">
+            <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg></div>
+            <div><div class="card-title font-display">Buscar na Tabela FIPE</div><div class="card-subtitle">Selecione marca, modelo e ano</div></div>
+          </div>
+          <div>
+            <label class="form-label">🏭 Marca</label>
+            <div class="select-wrapper">
+              <select id="selectMarca" class="form-select"><option value="">Carregando...</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">🚗 Modelo</label>
+            <div class="select-wrapper">
+              <select id="selectModelo" class="form-select" disabled><option value="">Selecione</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+          <div>
+            <label class="form-label">📅 Ano</label>
+            <div class="select-wrapper">
+              <select id="selectAno" class="form-select" disabled><option value="">Selecione</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+            </div>
+          </div>
+          <button id="btnConsultarFipe" class="btn-primary gradient-primary glow-primary" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+            Consultar Preço FIPE
+          </button>
+        </div>
+
+        <!-- Error -->
+        <div id="fipeError" class="error-box" style="display:none">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+          <p id="fipeErrorMsg"></p>
+        </div>
+
+        <!-- Loading -->
+        <div id="fipeLoading" class="spinner-wrap" style="display:none">
+          <div class="spinner"><div class="ring1"></div><div class="ring2"></div><div class="ring3"></div></div>
+          <p class="text-muted" style="font-size:14px;font-weight:500">Consultando tabela FIPE...</p>
+        </div>
+
+        <!-- Result Container -->
+        <div id="fipeResultArea" style="display:none" class="space-y fade-in"></div>
+      </div>
+    </section>
+
+    <!-- ═══ VISTORIA TAB ═══ -->
+    <section id="tab-vistoria" class="tab-content">
+      <div class="space-y" id="vistoriaContent"></div>
+    </section>
+
+    <!-- ═══ CUSTO TAB ═══ -->
+    <section id="tab-custo" class="tab-content">
+      <div class="space-y">
+        <div class="glass-card card-section space-y-sm" style="padding:20px">
+          <div class="card-header">
+            <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2.5"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></svg></div>
+            <div><div class="card-title font-display">Custo de Propriedade</div><div class="card-subtitle">Quanto custa manter seu carro por mês</div></div>
+          </div>
+          <div>
+            <label class="form-label">💰 Valor FIPE (R$)</label>
+            <input id="custoValorFipe" type="text" inputmode="numeric" placeholder="Ex: 50.000" class="form-input" />
+          </div>
+          <div class="grid-2">
+            <div>
+              <label class="form-label">📍 Estado</label>
+              <div class="select-wrapper">
+                <select id="custoEstado" class="form-select"></select>
+                <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></div>
+              </div>
+            </div>
+            <div>
+              <label class="form-label">📅 Idade (anos)</label>
+              <input id="custoIdade" type="text" inputmode="numeric" placeholder="5" value="5" class="form-input" />
+            </div>
+          </div>
+          <div class="grid-3">
+            <div>
+              <label class="form-label">🛣️ KM/mês</label>
+              <input id="custoKm" type="text" inputmode="numeric" placeholder="1500" value="1500" class="form-input" style="padding:0 12px" />
+            </div>
+            <div>
+              <label class="form-label">⛽ KM/L</label>
+              <input id="custoConsumo" type="text" inputmode="decimal" placeholder="12" value="12" class="form-input" style="padding:0 12px" />
+            </div>
+            <div>
+              <label class="form-label">⛽ R$/L</label>
+              <input id="custoPrecoComb" type="text" inputmode="decimal" placeholder="5.80" value="5.80" class="form-input" style="padding:0 12px" />
+            </div>
+          </div>
+          <button id="btnCalcularCusto" class="btn-primary gradient-primary glow-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>
+            Calcular Custo Mensal
+          </button>
+        </div>
+        <div id="custoResultArea" style="display:none" class="space-y fade-in"></div>
+      </div>
+    </section>
+
+    <!-- ═══ DETRAN TAB ═══ -->
+    <section id="tab-detran" class="tab-content">
+      <div class="space-y">
+        <div class="glass-card card-section space-y-sm" style="padding:20px">
+          <div class="card-header">
+            <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/><path d="m9 12 2 2 4-4"/></svg></div>
+            <div><div class="card-title font-display">Consulta Detran</div><div class="card-subtitle">Verifique a situação do veículo</div></div>
+          </div>
+          <div>
+            <label class="form-label">🔖 Placa do Veículo</label>
+            <input id="detranPlaca" type="text" inputmode="text" placeholder="Ex: ABC-1234" maxlength="8" class="placa-input" />
+          </div>
+          <div>
+            <label class="form-label">📍 Estado (UF)</label>
+            <div class="select-wrapper">
+              <select id="detranUF" class="form-select"><option value="">Selecione o estado</option></select>
+              <div class="select-arrow"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg></div>
+            </div>
+          </div>
+          <p id="detranError" class="text-destructive" style="font-size:12px;font-weight:500;display:none"></p>
+          <button id="btnDetran" class="btn-primary gradient-primary glow-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></svg>
+            Consultar no Detran
+          </button>
+        </div>
+
+        <!-- Info Card -->
+        <div class="glass-card card-section space-y-xs" style="padding:20px">
+          <h3 class="cat-title font-display">📋 O que consultar no Detran?</h3>
+          <ul class="info-list">
+            <li><span>🔍</span> Débitos e multas pendentes</li>
+            <li><span>📄</span> Situação do CRLV e licenciamento</li>
+            <li><span>🚫</span> Restrições e bloqueios judiciais</li>
+            <li><span>🔁</span> Recall pendente do fabricante</li>
+            <li><span>⚠️</span> Registro de sinistro ou roubo/furto</li>
+          </ul>
+          <div style="margin-top:8px;padding:12px;border-radius:12px;background:hsl(var(--accent)/0.1);border:1px solid hsl(var(--accent)/0.2)">
+            <p style="font-size:10px;font-weight:600;color:hsl(var(--accent))">💡 Dica: Sempre consulte antes de comprar um veículo usado. É gratuito na maioria dos estados!</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ═══════════════ FOOTER ═══════════════ -->
+  <footer>
+    <div class="inner">Dados fornecidos pela Tabela FIPE · Fipe Scanner © <span id="footerYear"></span></div>
+  </footer>
+
+  <!-- ═══════════════ JAVASCRIPT ═══════════════ -->
+  <script>
+  (function() {
+    'use strict';
+
+    // ─── Constants ───
+    const FIPE_API = 'https://parallelum.com.br/fipe/api/v1';
+    const VISTORIA_KEY = 'fipe_scanner_vistoria';
+    const HISTORICO_KEY = 'fipe_scanner_historico';
+    const THEME_KEY = 'fipe-theme';
+
+    // ─── Estados (IPVA) ───
+    const ESTADOS_IPVA = [
+      {uf:"AC",aliquota:2},{uf:"AL",aliquota:3},{uf:"AM",aliquota:3},{uf:"AP",aliquota:3},
+      {uf:"BA",aliquota:3},{uf:"CE",aliquota:3},{uf:"DF",aliquota:3.5},{uf:"ES",aliquota:2},
+      {uf:"GO",aliquota:3.75},{uf:"MA",aliquota:2.5},{uf:"MG",aliquota:4},{uf:"MS",aliquota:3.5},
+      {uf:"MT",aliquota:3},{uf:"PA",aliquota:2.5},{uf:"PB",aliquota:2.5},{uf:"PE",aliquota:3},
+      {uf:"PI",aliquota:2.5},{uf:"PR",aliquota:3.5},{uf:"RJ",aliquota:4},{uf:"RN",aliquota:3},
+      {uf:"RO",aliquota:3},{uf:"RR",aliquota:3},{uf:"RS",aliquota:3},{uf:"SC",aliquota:2},
+      {uf:"SE",aliquota:2.5},{uf:"SP",aliquota:4},{uf:"TO",aliquota:2}
+    ].sort((a,b) => a.uf.localeCompare(b.uf));
+
+    // ─── Detran URLs ───
+    const DETRAN_URLS = {
+      AC:{nome:"Acre",url:"https://detran.ac.gov.br"},AL:{nome:"Alagoas",url:"https://www.detran.al.gov.br"},
+      AP:{nome:"Amapá",url:"https://www.detran.ap.gov.br"},AM:{nome:"Amazonas",url:"https://www.detran.am.gov.br"},
+      BA:{nome:"Bahia",url:"https://www.detran.ba.gov.br"},CE:{nome:"Ceará",url:"https://www.detran.ce.gov.br"},
+      DF:{nome:"Distrito Federal",url:"https://www.detran.df.gov.br"},ES:{nome:"Espírito Santo",url:"https://www.detran.es.gov.br"},
+      GO:{nome:"Goiás",url:"https://www.detran.go.gov.br"},MA:{nome:"Maranhão",url:"https://www.detran.ma.gov.br"},
+      MT:{nome:"Mato Grosso",url:"https://www.detran.mt.gov.br"},MS:{nome:"Mato Grosso do Sul",url:"https://www.detran.ms.gov.br"},
+      MG:{nome:"Minas Gerais",url:"https://www.detran.mg.gov.br"},PA:{nome:"Pará",url:"https://www.detran.pa.gov.br"},
+      PB:{nome:"Paraíba",url:"https://www.detran.pb.gov.br"},PR:{nome:"Paraná",url:"https://www.detran.pr.gov.br"},
+      PE:{nome:"Pernambuco",url:"https://www.detran.pe.gov.br"},PI:{nome:"Piauí",url:"https://www.detran.pi.gov.br"},
+      RJ:{nome:"Rio de Janeiro",url:"https://www.detran.rj.gov.br"},RN:{nome:"Rio Grande do Norte",url:"https://www.detran.rn.gov.br"},
+      RS:{nome:"Rio Grande do Sul",url:"https://www.detranrs.rs.gov.br"},RO:{nome:"Rondônia",url:"https://www.detran.ro.gov.br"},
+      RR:{nome:"Roraima",url:"https://www.detran.rr.gov.br"},SC:{nome:"Santa Catarina",url:"https://www.detran.sc.gov.br"},
+      SP:{nome:"São Paulo",url:"https://www.detran.sp.gov.br"},SE:{nome:"Sergipe",url:"https://www.detran.se.gov.br"},
+      TO:{nome:"Tocantins",url:"https://www.detran.to.gov.br"}
+    };
+
+    // ─── Placa Faixas (DENATRAN) ───
+    const PLACA_FAIXAS = [
+      {inicio:"AAA",fim:"BEZ",uf:"PR"},{inicio:"BFA",fim:"GKI",uf:"SP"},{inicio:"GKJ",fim:"HOK",uf:"MG"},
+      {inicio:"HOL",fim:"HQE",uf:"MA"},{inicio:"HQF",fim:"HTW",uf:"MS"},{inicio:"HTX",fim:"HZA",uf:"CE"},
+      {inicio:"HZB",fim:"IAP",uf:"SE"},{inicio:"IAQ",fim:"JDO",uf:"RS"},{inicio:"JDP",fim:"JKR",uf:"DF"},
+      {inicio:"JKS",fim:"JSZ",uf:"BA"},{inicio:"JTA",fim:"JWE",uf:"PA"},{inicio:"JWF",fim:"JXY",uf:"AM"},
+      {inicio:"JXZ",fim:"KAU",uf:"MT"},{inicio:"KAV",fim:"KFC",uf:"GO"},{inicio:"KFD",fim:"KME",uf:"PE"},
+      {inicio:"KMF",fim:"LVE",uf:"RJ"},{inicio:"LVF",fim:"LWQ",uf:"PI"},{inicio:"LWR",fim:"MMM",uf:"SC"},
+      {inicio:"MMN",fim:"MOW",uf:"PB"},{inicio:"MOX",fim:"MTZ",uf:"ES"},{inicio:"MUA",fim:"MVK",uf:"AL"},
+      {inicio:"MVL",fim:"MXG",uf:"TO"},{inicio:"MXH",fim:"MZM",uf:"RN"},{inicio:"MZN",fim:"NAG",uf:"AC"},
+      {inicio:"NAH",fim:"NBA",uf:"RR"},{inicio:"NBB",fim:"NEH",uf:"RO"},{inicio:"NEI",fim:"NFB",uf:"AP"},
+      {inicio:"NFC",fim:"NGZ",uf:"GO"},{inicio:"NHA",fim:"NHT",uf:"MA"},{inicio:"NHU",fim:"NIX",uf:"PI"},
+      {inicio:"NIY",fim:"NJW",uf:"MT"},{inicio:"NJX",fim:"NLU",uf:"GO"},{inicio:"NLV",fim:"NMO",uf:"AL"},
+      {inicio:"NMP",fim:"NNI",uf:"MA"},{inicio:"NNJ",fim:"NOH",uf:"RN"},{inicio:"NOI",fim:"NPB",uf:"AM"},
+      {inicio:"NPC",fim:"NPQ",uf:"MT"},{inicio:"NPR",fim:"NQK",uf:"PB"},{inicio:"NQL",fim:"NRE",uf:"CE"},
+      {inicio:"NRF",fim:"NSD",uf:"MS"},{inicio:"NSE",fim:"NTC",uf:"PA"},{inicio:"NTD",fim:"NTW",uf:"BA"},
+      {inicio:"NTX",fim:"NUG",uf:"MT"},{inicio:"NUH",fim:"NUL",uf:"RR"},{inicio:"NUM",fim:"NVF",uf:"CE"},
+      {inicio:"NVG",fim:"NVN",uf:"SE"},{inicio:"NVO",fim:"NWR",uf:"GO"},{inicio:"NWS",fim:"NXQ",uf:"MA"},
+      {inicio:"NXR",fim:"NXT",uf:"AC"},{inicio:"NXU",fim:"NXW",uf:"PE"},{inicio:"NXX",fim:"NYG",uf:"MG"},
+      {inicio:"NYH",fim:"NZZ",uf:"BA"},
+      {inicio:"OAA",fim:"OAO",uf:"AM"},{inicio:"OAP",fim:"OBS",uf:"MT"},{inicio:"OBT",fim:"OCA",uf:"PA"},
+      {inicio:"OCB",fim:"OCU",uf:"CE"},{inicio:"OCV",fim:"ODT",uf:"ES"},{inicio:"ODU",fim:"OEI",uf:"PI"},
+      {inicio:"OEJ",fim:"OES",uf:"SE"},{inicio:"OET",fim:"OFH",uf:"PB"},{inicio:"OFI",fim:"OFW",uf:"PA"},
+      {inicio:"OFX",fim:"OGG",uf:"PB"},{inicio:"OGH",fim:"OHA",uf:"GO"},{inicio:"OHB",fim:"OHK",uf:"AL"},
+      {inicio:"OHL",fim:"OHW",uf:"RO"},{inicio:"OHX",fim:"OIQ",uf:"CE"},{inicio:"OIR",fim:"OJQ",uf:"MA"},
+      {inicio:"OJR",fim:"OKC",uf:"RN"},{inicio:"OKD",fim:"OKH",uf:"SC"},{inicio:"OKI",fim:"OLG",uf:"BA"},
+      {inicio:"OLH",fim:"OLN",uf:"TO"},{inicio:"OLO",fim:"OMH",uf:"MG"},{inicio:"OMI",fim:"OOF",uf:"GO"},
+      {inicio:"OOG",fim:"OOU",uf:"MS"},{inicio:"OOV",fim:"ORC",uf:"MG"},{inicio:"ORD",fim:"ORM",uf:"AL"},
+      {inicio:"ORN",fim:"OSV",uf:"CE"},{inicio:"OSW",fim:"OTZ",uf:"PA"},{inicio:"OUA",fim:"OUE",uf:"PI"},
+      {inicio:"OUF",fim:"OVD",uf:"BA"},{inicio:"OVE",fim:"OVF",uf:"ES"},{inicio:"OVG",fim:"OVG",uf:"AC"},
+      {inicio:"OVH",fim:"OVL",uf:"ES"},{inicio:"OVM",fim:"OVV",uf:"DF"},{inicio:"OVW",fim:"OVY",uf:"PI"},
+      {inicio:"OVZ",fim:"OWG",uf:"RN"},{inicio:"OWH",fim:"OXK",uf:"MG"},{inicio:"OXL",fim:"OXL",uf:"RO"},
+      {inicio:"OXM",fim:"OXM",uf:"AM"},{inicio:"OXN",fim:"OXN",uf:"AL"},{inicio:"OXO",fim:"OXO",uf:"PB"},
+      {inicio:"OXP",fim:"OXP",uf:"AC"},{inicio:"OXQ",fim:"OXZ",uf:"MA"},{inicio:"OYA",fim:"OYC",uf:"TO"},
+      {inicio:"OYD",fim:"OYK",uf:"ES"},{inicio:"OYL",fim:"OYZ",uf:"PE"},{inicio:"OZA",fim:"OZA",uf:"CE"},
+      {inicio:"OZB",fim:"OZB",uf:"SE"},{inicio:"OZC",fim:"OZV",uf:"BA"},{inicio:"OZW",fim:"PBZ",uf:"DF"},
+      {inicio:"PCA",fim:"PGZ",uf:"PE"},{inicio:"PHA",fim:"PHZ",uf:"AM"},{inicio:"PIA",fim:"PIZ",uf:"PI"},
+      {inicio:"PJA",fim:"PLZ",uf:"BA"},{inicio:"PMA",fim:"POZ",uf:"CE"},{inicio:"PPA",fim:"PPZ",uf:"ES"},
+      {inicio:"PQA",fim:"PRZ",uf:"GO"},{inicio:"PSA",fim:"PTZ",uf:"MA"},{inicio:"PUA",fim:"PZZ",uf:"MG"},
+      {inicio:"QAA",fim:"QAZ",uf:"MS"},{inicio:"QBA",fim:"QCZ",uf:"MT"},{inicio:"QDA",fim:"QEZ",uf:"PA"},
+      {inicio:"QFA",fim:"QFZ",uf:"PB"},{inicio:"QGA",fim:"QGZ",uf:"RN"},{inicio:"QHA",fim:"QJZ",uf:"SC"},
+      {inicio:"QKA",fim:"QKM",uf:"TO"},{inicio:"QKN",fim:"QKZ",uf:"SE"},{inicio:"QLA",fim:"QLM",uf:"AL"},
+      {inicio:"QLN",fim:"QLT",uf:"AP"},{inicio:"QLU",fim:"QLZ",uf:"AC"},{inicio:"QMA",fim:"QMP",uf:"SE"},
+      {inicio:"QMQ",fim:"QQZ",uf:"MG"},{inicio:"QRA",fim:"QRA",uf:"RO"},{inicio:"QRB",fim:"QRM",uf:"ES"},
+      {inicio:"QRN",fim:"QRZ",uf:"PI"},{inicio:"QSA",fim:"QSM",uf:"PB"},{inicio:"QSN",fim:"QSZ",uf:"SP"},
+      {inicio:"QTA",fim:"QTJ",uf:"RO"},{inicio:"QTK",fim:"QTM",uf:"SC"},{inicio:"QTN",fim:"QTS",uf:"GO"},
+      {inicio:"QTT",fim:"QTT",uf:"AL"},{inicio:"QTU",fim:"QTZ",uf:"BA"},{inicio:"QUA",fim:"QUZ",uf:"MG"},
+      {inicio:"QVA",fim:"QVZ",uf:"PA"},{inicio:"QWA",fim:"QWF",uf:"TO"},{inicio:"QWG",fim:"QWL",uf:"AL"},
+      {inicio:"QWM",fim:"QWQ",uf:"AC"},{inicio:"QWR",fim:"QXZ",uf:"MG"},{inicio:"QYA",fim:"QYZ",uf:"PE"},
+      {inicio:"QZA",fim:"QZZ",uf:"AM"},
+      {inicio:"RAA",fim:"RAJ",uf:"SC"},{inicio:"RAK",fim:"RAZ",uf:"MT"},{inicio:"RBA",fim:"RBJ",uf:"ES"},
+      {inicio:"RBK",fim:"RCN",uf:"GO"},{inicio:"RCO",fim:"RDR",uf:"BA"},{inicio:"RDS",fim:"REB",uf:"SC"},
+      {inicio:"REC",fim:"REZ",uf:"DF"},{inicio:"RFA",fim:"RGD",uf:"MG"},{inicio:"RGE",fim:"RGN",uf:"RN"},
+      {inicio:"RGO",fim:"RGZ",uf:"AL"},{inicio:"RHA",fim:"RHZ",uf:"PR"},{inicio:"RIA",fim:"RIN",uf:"CE"},
+      {inicio:"RIO",fim:"RKV",uf:"RJ"},{inicio:"RKW",fim:"RLP",uf:"SC"},{inicio:"RLQ",fim:"RMC",uf:"PB"},
+      {inicio:"RMD",fim:"RMZ",uf:"MG"},{inicio:"ROA",fim:"ROZ",uf:"MA"},{inicio:"RPA",fim:"RPZ",uf:"BA"},
+      {inicio:"RQA",fim:"RQL",uf:"RN"},{inicio:"RQM",fim:"RQV",uf:"ES"},{inicio:"RQW",fim:"RRH",uf:"SE"},
+      {inicio:"RRI",fim:"RRZ",uf:"MT"},{inicio:"RSA",fim:"RSF",uf:"TO"},{inicio:"RSG",fim:"RST",uf:"PI"},
+      {inicio:"RSU",fim:"RSZ",uf:"RO"},{inicio:"RTA",fim:"RVZ",uf:"MG"},{inicio:"RWA",fim:"RWJ",uf:"MS"},
+      {inicio:"RWK",fim:"RXJ",uf:"PA"},{inicio:"RXK",fim:"RYZ",uf:"SC"},{inicio:"RZA",fim:"RZD",uf:"RR"},
+      {inicio:"RZE",fim:"RZZ",uf:"PE"},
+      {inicio:"SAA",fim:"SAJ",uf:"AL"},{inicio:"SAK",fim:"SAM",uf:"AP"},{inicio:"SAN",fim:"SBV",uf:"CE"},
+      {inicio:"SBW",fim:"SDO",uf:"GO"},{inicio:"SDP",fim:"SFO",uf:"PR"},{inicio:"SFP",fim:"SGM",uf:"ES"},
+      {inicio:"SGN",fim:"SGZ",uf:"DF"},{inicio:"SHA",fim:"SHA",uf:"AC"},{inicio:"SHB",fim:"SJI",uf:"MG"},
+      {inicio:"SJJ",fim:"SKT",uf:"BA"},{inicio:"SKU",fim:"SLF",uf:"PB"},{inicio:"SLG",fim:"SLL",uf:"RO"},
+      {inicio:"SLM",fim:"SLV",uf:"PI"},{inicio:"SLW",fim:"SML",uf:"MS"},{inicio:"SMM",fim:"SNJ",uf:"MA"},
+      {inicio:"SNK",fim:"SPB",uf:"PE"},{inicio:"SPC",fim:"SPV",uf:"MT"},{inicio:"SQQ",fim:"SQU",uf:"AC"},
+      {inicio:"SQV",fim:"SSE",uf:"RJ"},{inicio:"SSF",fim:"SSQ",uf:"DF"},{inicio:"SSR",fim:"SWZ",uf:"SP"},
+      {inicio:"SXA",fim:"SXJ",uf:"SC"},{inicio:"SYA",fim:"SYZ",uf:"MG"},{inicio:"SZA",fim:"SZZ",uf:"PA"},
+      {inicio:"TAA",fim:"TAH",uf:"AM"},{inicio:"TAI",fim:"TBZ",uf:"PR"},{inicio:"TCA",fim:"TDZ",uf:"MG"},
+      {inicio:"TFA",fim:"TFN",uf:"GO"},{inicio:"TGO",fim:"TGQ",uf:"AP"},{inicio:"THI",fim:"THL",uf:"RO"},
+      {inicio:"THM",fim:"TIN",uf:"CE"},{inicio:"TIO",fim:"TMJ",uf:"SP"}
+    ];
+
+    // ─── Checklist data ───
+    const CHECKLIST_DATA = [
+      { name:"Documentação", icon:"📄", items:[
+        {id:"doc1",text:"CRLV em dia e sem restrições"},{id:"doc2",text:"Verificar débitos de IPVA e multas"},
+        {id:"doc3",text:"Consultar situação no Detran (roubo/furto)"},{id:"doc4",text:"Conferir número do chassi com documento"},
+        {id:"doc5",text:"Verificar se há financiamento em aberto"},{id:"doc6",text:"Checar recalls pendentes no site do fabricante"}
+      ]},
+      { name:"Exterior", icon:"🚗", items:[
+        {id:"ext1",text:"Verificar pintura (diferenças de tom = repintura)"},{id:"ext2",text:"Checar alinhamento de portas e capô"},
+        {id:"ext3",text:"Procurar ferrugem (caixas de roda, soleira, assoalho)"},{id:"ext4",text:"Conferir pneus (desgaste uniforme, marca, DOT)"},
+        {id:"ext5",text:"Verificar vidros (trincas, marca original)"},{id:"ext6",text:"Testar todas as luzes (farol, ré, seta, freio)"},
+        {id:"ext7",text:"Checar para-choques (encaixe, riscos profundos)"}
+      ]},
+      { name:"Interior", icon:"💺", items:[
+        {id:"int1",text:"Verificar odor (mofo, cigarro, animal)"},{id:"int2",text:"Testar ar-condicionado (frio forte)"},
+        {id:"int3",text:"Conferir painel (todas as luzes acendem na chave)"},{id:"int4",text:"Testar todos os vidros elétricos"},
+        {id:"int5",text:"Verificar bancos (rasgos, manchas, ajustes)"},{id:"int6",text:"Testar multimídia, rádio e USB"},
+        {id:"int7",text:"Checar retrovisores elétricos"}
+      ]},
+      { name:"Motor", icon:"🔧", items:[
+        {id:"mot1",text:"Motor frio: verificar cor do óleo (tampa)"},{id:"mot2",text:"Checar nível e cor do líquido de arrefecimento"},
+        {id:"mot3",text:"Observar fumaça no escapamento (azul/branca = problema)"},{id:"mot4",text:"Ouvir ruídos estranhos em marcha lenta"},
+        {id:"mot5",text:"Verificar correias e mangueiras (rachaduras)"},{id:"mot6",text:"Checar bateria (data, terminais)"}
+      ]},
+      { name:"Test Drive", icon:"🏁", items:[
+        {id:"td1",text:"Testar freios (ruído, vibração, eficiência)"},{id:"td2",text:"Verificar câmbio (trocas suaves, sem trancos)"},
+        {id:"td3",text:"Ouvir suspensão em buracos e lombadas"},{id:"td4",text:"Testar direção (alinhamento, barulhos)"},
+        {id:"td5",text:"Verificar se puxa para algum lado"},{id:"td6",text:"Observar temperatura do motor após 15min"}
+      ]}
+    ];
+
+    // ─── Utility Functions ───
+    function formatCurrency(v) { return v.toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); }
+    function parseFipeValue(s) { return Number(s.replace(/[R$\s.]/g,'').replace(',','.')); }
+    function formatNumInput(v) { const n=v.replace(/\D/g,''); return n?Number(n).toLocaleString('pt-BR'):''; }
+    function $(sel) { return document.querySelector(sel); }
+    function $$(sel) { return document.querySelectorAll(sel); }
+
+    // ─── Theme ───
+    function initTheme() {
+      const stored = localStorage.getItem(THEME_KEY);
+      const dark = stored ? stored === 'dark' : window.matchMedia('(prefers-color-scheme:dark)').matches;
+      applyTheme(dark);
+    }
+    function applyTheme(dark) {
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light');
+      $('#iconSun').style.display = dark ? 'block' : 'none';
+      $('#iconMoon').style.display = dark ? 'none' : 'block';
+    }
+    $('#themeToggle').addEventListener('click', () => {
+      applyTheme(!document.documentElement.classList.contains('dark'));
+    });
+
+    // ─── Tabs ───
+    function switchTab(tabId) {
+      $$('.tab-content').forEach(el => el.classList.remove('active'));
+      $$('.tab-btn').forEach(btn => {
+        btn.classList.remove('active','gradient-primary','glow-primary');
+      });
+      const content = $('#tab-' + tabId);
+      const btn = document.querySelector('[data-tab="'+tabId+'"]');
+      if (content) content.classList.add('active');
+      if (btn) { btn.classList.add('active','gradient-primary','glow-primary'); }
+    }
+    $$('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+    });
+
+    // ─── Footer year ───
+    $('#footerYear').textContent = new Date().getFullYear();
+
+    // ══════════════════════════════════════════
+    // ═══ COTAÇÃO TAB LOGIC ═══
+    // ══════════════════════════════════════════
+    const selectMarca = $('#selectMarca');
+    const selectModelo = $('#selectModelo');
+    const selectAno = $('#selectAno');
+    const btnConsultar = $('#btnConsultarFipe');
+    const fipeError = $('#fipeError');
+    const fipeErrorMsg = $('#fipeErrorMsg');
+    const fipeLoading = $('#fipeLoading');
+    const fipeResultArea = $('#fipeResultArea');
+    let currentFipeResult = null;
+    let currentFipeValue = 0;
+    let priceChartInstance = null;
+
+    function showFipeError(msg) { fipeErrorMsg.textContent = msg; fipeError.style.display = 'flex'; }
+    function hideFipeError() { fipeError.style.display = 'none'; }
+
+    // Load marcas
+    async function loadMarcas() {
+      try {
+        const res = await fetch(FIPE_API + '/carros/marcas');
+        const data = await res.json();
+        selectMarca.innerHTML = '<option value="">Selecione</option>';
+        data.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.codigo; opt.textContent = m.nome;
+          selectMarca.appendChild(opt);
+        });
+      } catch { showFipeError('Erro ao carregar marcas.'); }
+    }
+
+    selectMarca.addEventListener('change', async () => {
+      const marcaId = selectMarca.value;
+      selectModelo.innerHTML = '<option value="">Carregando...</option>';
+      selectModelo.disabled = true;
+      selectAno.innerHTML = '<option value="">Selecione</option>';
+      selectAno.disabled = true;
+      btnConsultar.disabled = true;
+      fipeResultArea.style.display = 'none';
+      hideFipeError();
+      if (!marcaId) { selectModelo.innerHTML = '<option value="">Selecione</option>'; return; }
+      try {
+        const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos');
+        const data = await res.json();
+        selectModelo.innerHTML = '<option value="">Selecione</option>';
+        data.modelos.forEach(m => {
+          const opt = document.createElement('option');
+          opt.value = m.codigo; opt.textContent = m.nome;
+          selectModelo.appendChild(opt);
+        });
+        selectModelo.disabled = false;
+      } catch { showFipeError('Erro ao carregar modelos.'); }
+    });
+
+    selectModelo.addEventListener('change', async () => {
+      const marcaId = selectMarca.value, modeloId = selectModelo.value;
+      selectAno.innerHTML = '<option value="">Carregando...</option>';
+      selectAno.disabled = true;
+      btnConsultar.disabled = true;
+      fipeResultArea.style.display = 'none';
+      hideFipeError();
+      if (!modeloId) { selectAno.innerHTML = '<option value="">Selecione</option>'; return; }
+      try {
+        const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos/' + modeloId + '/anos');
+        const data = await res.json();
+        selectAno.innerHTML = '<option value="">Selecione</option>';
+        data.forEach(a => {
+          const opt = document.createElement('option');
+          opt.value = a.codigo; opt.textContent = a.nome;
+          selectAno.appendChild(opt);
+        });
+        selectAno.disabled = false;
+      } catch { showFipeError('Erro ao carregar anos.'); }
+    });
+
+    selectAno.addEventListener('change', () => {
+      btnConsultar.disabled = !selectAno.value;
+      fipeResultArea.style.display = 'none';
+    });
+
+    btnConsultar.addEventListener('click', async () => {
+      const marcaId = selectMarca.value, modeloId = selectModelo.value, anoId = selectAno.value;
+      if (!marcaId || !modeloId || !anoId) return;
+      hideFipeError();
+      fipeLoading.style.display = 'flex';
+      fipeResultArea.style.display = 'none';
+      try {
+        const res = await fetch(FIPE_API + '/carros/marcas/' + marcaId + '/modelos/' + modeloId + '/anos/' + anoId);
+        const preco = await res.json();
+        currentFipeResult = preco;
+        currentFipeValue = parseFipeValue(preco.Valor);
+        renderFipeResult(preco);
+      } catch { showFipeError('Erro ao consultar preço FIPE.'); }
+      fipeLoading.style.display = 'none';
+    });
+
+    function generateSimulatedHistory(currentPrice) {
+      const months = ['Jul','Ago','Set','Out','Nov','Dez','Jan','Fev','Mar','Abr','Mai','Jun'];
+      const data = [];
+      let price = currentPrice * (1 + (Math.random() * 0.06 - 0.03));
+      for (let i = 0; i < 12; i++) {
+        price = price * (1 + (Math.random() - 0.45) * 0.02);
+        data.push(Math.round(price));
+      }
+      data[11] = currentPrice;
+      return { labels: months, data };
+    }
+
+    function evaluateDeal(fipeValue, adValue) {
+      const pct = (adValue / fipeValue) * 100;
+      if (pct < 80) return { percentage:pct, zone:'red', label:'ALERTA VERMELHO', message:'Preço muito abaixo da FIPE. Provável golpe, sinistro, ou problema grave oculto. Desconfie!' };
+      if (pct <= 95) return { percentage:pct, zone:'green', label:'ÓTIMA OPORTUNIDADE', message:'Preço abaixo da FIPE! Pode ser uma boa oportunidade, mas faça vistoria completa antes de fechar.' };
+      if (pct <= 105) return { percentage:pct, zone:'green', label:'PREÇO JUSTO', message:'Dentro da faixa normal de mercado. Negocie com segurança e faça vistoria cautelar.' };
+      if (pct <= 120) return { percentage:pct, zone:'yellow', label:'ACIMA DA FIPE', message:'Preço acima da tabela. Só vale se o carro estiver impecável e com baixa quilometragem.' };
+      return { percentage:pct, zone:'yellow', label:'MUITO CARO', message:'Preço muito acima da FIPE. Não pague isso. Negocie fortemente ou busque outras opções.' };
+    }
+
+    function renderGaugeSVG(percentage, label, zone) {
+      const clamped = Math.max(60, Math.min(140, percentage));
+      const angle = ((clamped - 60) / 80) * 180;
+      const colors = {
+        green: { stroke:'hsl(145,65%,42%)', cls:'text-success' },
+        yellow: { stroke:'hsl(25,95%,53%)', cls:'text-accent' },
+        red: { stroke:'hsl(0,72%,51%)', cls:'text-destructive' }
+      };
+      const c = colors[zone];
+      const x2 = 100 + 65 * Math.cos(((180 - angle) * Math.PI) / 180);
+      const y2 = 100 - 65 * Math.sin(((180 - angle) * Math.PI) / 180);
+      return `
+        <div class="gauge-wrap">
+          <div class="gauge-svg">
+            <svg viewBox="0 0 200 110" style="width:100%;height:100%">
+              <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="hsl(0,0%,14%)" stroke-width="16" stroke-linecap="round"/>
+              <path d="M 20 100 A 80 80 0 0 1 55 40" fill="none" stroke="hsl(0,72%,51%,0.3)" stroke-width="16" stroke-linecap="round"/>
+              <path d="M 65 30 A 80 80 0 0 1 135 30" fill="none" stroke="hsl(145,65%,42%,0.3)" stroke-width="16" stroke-linecap="round"/>
+              <path d="M 145 40 A 80 80 0 0 1 180 100" fill="none" stroke="hsl(25,95%,53%,0.3)" stroke-width="16" stroke-linecap="round"/>
+              <line x1="100" y1="100" x2="${x2}" y2="${y2}" stroke="${c.stroke}" stroke-width="3" stroke-linecap="round" style="transition:all .7s ease-out"/>
+              <circle cx="100" cy="100" r="7" fill="${c.stroke}"/>
+              <circle cx="100" cy="100" r="3" fill="hsl(0,0%,8%)"/>
+              <text x="8" y="108" font-size="8" fill="hsl(0,72%,55%)" font-weight="700" font-family="Space Grotesk">GOLPE</text>
+              <text x="83" y="18" font-size="8" fill="hsl(145,65%,50%)" font-weight="700" font-family="Space Grotesk">BOM</text>
+              <text x="153" y="108" font-size="8" fill="hsl(25,95%,58%)" font-weight="700" font-family="Space Grotesk">CARO</text>
+            </svg>
+          </div>
+          <div class="gauge-text">
+            <p class="gauge-perc font-display ${c.cls}">${percentage.toFixed(0)}%</p>
+            <p class="gauge-label ${c.cls}">${label}</p>
+          </div>
+        </div>`;
+    }
+
+    function renderFipeResult(preco) {
+      const historyData = generateSimulatedHistory(currentFipeValue);
+
+      fipeResultArea.innerHTML = `
+        <!-- Price Card -->
+        <div class="result-hero">
+          <div class="result-hero-top gradient-primary" style="color:hsl(var(--primary-foreground))">
+            <p class="label">Resultado da consulta</p>
+            <h3 style="font-size:18px;font-weight:700" class="font-display">${preco.Marca} ${preco.Modelo}</h3>
+            <p class="sub">Ano: ${preco.AnoModelo} · ${preco.Combustivel}</p>
+          </div>
+          <div class="glass-card" style="border-top:0;border-radius:0 0 16px 16px;padding:20px">
+            <div class="flex-between">
+              <div>
+                <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em" class="text-muted">Valor FIPE</p>
+                <p style="font-size:28px;font-weight:800" class="font-display text-gradient">${preco.Valor}</p>
+              </div>
+              <div style="text-align:right">
+                <p style="font-size:10px" class="text-muted">Ref: ${preco.MesReferencia}</p>
+                <p style="font-size:10px;margin-top:2px" class="text-muted">Cód: ${preco.CodigoFipe}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chart -->
+        <div class="glass-card card-section" style="padding:20px">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+            <h3 style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em" class="font-display text-fg">Histórico de preços</h3>
+            <span style="margin-left:auto;font-size:9px;padding:2px 8px;border-radius:999px;background:hsl(var(--secondary))" class="text-muted">simulado</span>
+          </div>
+          <div class="chart-wrap"><canvas id="priceChart"></canvas></div>
+        </div>
+
+        <!-- Dealometer -->
+        <div class="glass-card card-section space-y-sm" style="padding:20px">
+          <div class="card-header">
+            <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><path d="m12 14 4-4"/><path d="M3.34 19a10 10 0 1 1 17.32 0"/></svg></div>
+            <div><div class="card-title font-display">Dealometer</div><div class="card-subtitle">Compare com o valor do anúncio</div></div>
+          </div>
+          <div>
+            <label class="form-label">💰 Valor do Anúncio (R$)</label>
+            <input type="text" inputmode="numeric" placeholder="Ex: 42.000" id="inputAdValue" class="form-input" />
+          </div>
+          <button id="btnEvaluate" class="btn-primary gradient-primary glow-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+            Avaliar Negócio
+          </button>
+        </div>
+
+        <div id="dealResultArea" style="display:none" class="fade-in"></div>
+
+        <!-- Financiamento -->
+        <div class="glass-card card-section space-y-sm" style="padding:20px">
+          <div class="card-header">
+            <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg></div>
+            <div><div class="card-title font-display">Simulador de Financiamento</div><div class="card-subtitle">Valor FIPE: ${formatCurrency(currentFipeValue)}</div></div>
+          </div>
+          <div>
+            <label class="form-label">💵 Entrada (R$)</label>
+            <input type="text" inputmode="numeric" placeholder="Ex: 10.000 (opcional)" id="finEntrada" class="form-input" />
+          </div>
+          <div>
+            <label class="form-label">📈 Taxa de Juros (% ao mês)</label>
+            <input type="text" inputmode="decimal" placeholder="Ex: 1.5" id="finJuros" value="1.5" class="form-input" />
+          </div>
+          <div>
+            <label class="form-label" style="margin-bottom:8px">📅 Prazo (meses)</label>
+            <div class="prazo-grid" id="prazoGrid">
+              <button class="prazo-btn" data-prazo="12">12x</button>
+              <button class="prazo-btn" data-prazo="24">24x</button>
+              <button class="prazo-btn" data-prazo="36">36x</button>
+              <button class="prazo-btn active gradient-primary glow-primary" data-prazo="48">48x</button>
+              <button class="prazo-btn" data-prazo="60">60x</button>
+              <button class="prazo-btn" data-prazo="72">72x</button>
+            </div>
+          </div>
+          <button id="btnCalcularFin" class="btn-primary gradient-primary glow-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="16" height="20" x="4" y="2" rx="2"/><line x1="8" x2="16" y1="6" y2="6"/><line x1="16" x2="16" y1="14" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+            Calcular Parcelas
+          </button>
+        </div>
+        <div id="finResultArea" style="display:none" class="space-y fade-in"></div>
+      `;
+
+      fipeResultArea.style.display = 'block';
+
+      // Render chart
+      renderPriceChart(historyData);
+
+      // Wire up ad value input
+      const inputAd = $('#inputAdValue');
+      inputAd.addEventListener('input', () => { inputAd.value = formatNumInput(inputAd.value); });
+
+      // Wire up evaluate button
+      $('#btnEvaluate').addEventListener('click', () => {
+        const ad = Number(inputAd.value.replace(/\D/g,''));
+        if (!currentFipeValue || !ad) return;
+        const result = evaluateDeal(currentFipeValue, ad);
+        const area = $('#dealResultArea');
+        area.innerHTML = `
+          <div class="glass-card card-section fade-in" style="padding:24px;display:flex;flex-direction:column;align-items:center">
+            ${renderGaugeSVG(result.percentage, result.label, result.zone)}
+            <div class="ember-line" style="width:100%;margin:16px 0;border-radius:999px"></div>
+            <p style="font-size:14px;text-align:center;line-height:1.6;font-weight:500" class="text-fg">${result.message}</p>
+          </div>`;
+        area.style.display = 'block';
+
+        // Save to historico
+        salvarHistorico({
+          tipo:'cotacao',
+          titulo:'Cotação ' + result.label + ' — ' + result.percentage.toFixed(0) + '%',
+          resumo: currentFipeResult.Marca + ' ' + currentFipeResult.Modelo + ' · FIPE: ' + formatCurrency(currentFipeValue) + ' · Anúncio: ' + formatCurrency(ad)
+        });
+      });
+
+      // Wire up financiamento
+      const finEntrada = $('#finEntrada');
+      finEntrada.addEventListener('input', () => { finEntrada.value = formatNumInput(finEntrada.value); });
+
+      let selectedPrazo = 48;
+      $$('#prazoGrid .prazo-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          $$('#prazoGrid .prazo-btn').forEach(b => b.classList.remove('active','gradient-primary','glow-primary'));
+          btn.classList.add('active','gradient-primary','glow-primary');
+          selectedPrazo = Number(btn.dataset.prazo);
+        });
+      });
+
+      $('#btnCalcularFin').addEventListener('click', () => {
+        const e = Number(finEntrada.value.replace(/\D/g,'')) || 0;
+        const j = Number($('#finJuros').value.replace(',','.'));
+        const p = selectedPrazo;
+        if (!currentFipeValue || !j || !p || e >= currentFipeValue) return;
+
+        const financiado = currentFipeValue - e;
+        const taxaMensal = j / 100;
+        const parcela = financiado * (taxaMensal * Math.pow(1+taxaMensal,p)) / (Math.pow(1+taxaMensal,p)-1);
+        const totalPago = parcela * p + e;
+        const totalJuros = totalPago - currentFipeValue;
+        const pctPrincipal = ((totalPago - totalJuros) / totalPago) * 100;
+        const pctJuros = ((totalJuros / totalPago) * 100).toFixed(0);
+
+        const finArea = $('#finResultArea');
+        finArea.innerHTML = `
+          <div class="result-hero fade-in">
+            <div class="result-hero-top gradient-primary" style="color:hsl(var(--primary-foreground))">
+              <p class="label">Parcela mensal</p>
+              <p class="value font-display">${formatCurrency(Math.round(parcela*100)/100)}</p>
+              <p class="sub">${p}x parcelas fixas</p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div class="glass-card" style="border-radius:12px;padding:16px">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-accent" style="margin-bottom:4px"><line x1="12" x2="12" y1="2" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+              <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em" class="text-muted">Financiado</p>
+              <p style="font-size:14px;font-weight:700" class="font-display text-fg">${formatCurrency(financiado)}</p>
+            </div>
+            <div class="glass-card" style="border-radius:12px;padding:16px">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-destructive" style="margin-bottom:4px"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg>
+              <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em" class="text-muted">Total em Juros</p>
+              <p style="font-size:14px;font-weight:700" class="font-display text-destructive">${formatCurrency(Math.round(totalJuros*100)/100)}</p>
+            </div>
+          </div>
+          <div class="glass-card" style="border-radius:12px;padding:16px">
+            <p style="font-size:10px;text-transform:uppercase;letter-spacing:0.05em" class="text-muted">Total pago ao final</p>
+            <p style="font-size:18px;font-weight:700" class="font-display text-gradient">${formatCurrency(Math.round(totalPago*100)/100)}</p>
+            <div style="margin-top:8px;height:8px;border-radius:999px;overflow:hidden;background:hsl(var(--secondary))">
+              <div class="gradient-primary" style="height:100%;border-radius:999px;width:${Math.min(100,pctPrincipal)}%;transition:width .7s"></div>
+            </div>
+            <div class="flex-between" style="margin-top:4px">
+              <span style="font-size:9px" class="text-muted">Veículo</span>
+              <span style="font-size:9px" class="text-destructive">Juros (${pctJuros}%)</span>
+            </div>
+          </div>
+          <div class="glass-card tip-card">
+            <p class="tip-title">💡 Dica do Especialista</p>
+            <p class="tip-text">${totalJuros > financiado * 0.5
+              ? '⚠️ Os juros ultrapassam 50% do valor financiado. Considere dar uma entrada maior ou reduzir o prazo.'
+              : 'Financiamento dentro de uma faixa razoável. Sempre negocie a taxa de juros com diferentes bancos!'}</p>
+          </div>`;
+        finArea.style.display = 'block';
+      });
+    }
+
+    function renderPriceChart(historyData) {
+      if (priceChartInstance) priceChartInstance.destroy();
+      const ctx = document.getElementById('priceChart').getContext('2d');
+      priceChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: historyData.labels,
+          datasets: [{
+            label: 'Preço FIPE',
+            data: historyData.data,
+            borderColor: 'hsl(12,90%,52%)',
+            backgroundColor: function(context) {
+              const chart = context.chart;
+              const { ctx: c, chartArea } = chart;
+              if (!chartArea) return 'hsla(12,90%,52%,0.1)';
+              const g = c.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+              g.addColorStop(0, 'hsla(12,90%,52%,0.25)');
+              g.addColorStop(1, 'hsla(12,90%,52%,0)');
+              return g;
+            },
+            fill: true, tension: 0.4, pointRadius: 3, pointHoverRadius: 6,
+            pointBackgroundColor: 'hsl(25,95%,53%)',
+            pointBorderColor: 'hsl(0,0%,8%)', pointBorderWidth: 2, borderWidth: 2.5,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: {
+            tooltip: {
+              backgroundColor:'hsl(0,0%,8%)', titleColor:'hsl(0,0%,95%)',
+              bodyColor:'hsl(25,95%,58%)', borderColor:'hsl(12,90%,52%)',
+              borderWidth:1, padding:12, cornerRadius:10,
+              titleFont:{family:'Space Grotesk',weight:'bold',size:11},
+              bodyFont:{family:'Space Grotesk',weight:'bold',size:13},
+              callbacks:{ label: ctx => 'R$ ' + ctx.parsed.y.toLocaleString('pt-BR') }
+            },
+            legend:{display:false}
+          },
+          scales: {
+            x:{ grid:{color:'hsla(0,0%,14%,0.6)'}, ticks:{color:'hsl(0,0%,45%)',font:{size:10,family:'Inter'}} },
+            y:{ grid:{color:'hsla(0,0%,14%,0.6)'}, ticks:{color:'hsl(0,0%,45%)',font:{size:10,family:'Inter'},callback:v=>'R$ '+(v/1000).toFixed(0)+'k'} }
+          }
+        }
+      });
+    }
+
+    function salvarHistorico(entry) {
+      let hist = [];
+      try { hist = JSON.parse(localStorage.getItem(HISTORICO_KEY) || '[]'); } catch {}
+      hist.unshift({ ...entry, id: Date.now().toString(), data: new Date().toISOString() });
+      localStorage.setItem(HISTORICO_KEY, JSON.stringify(hist.slice(0, 50)));
+    }
+
+    // ══════════════════════════════════════════
+    // ═══ VISTORIA TAB LOGIC ═══
+    // ══════════════════════════════════════════
+    function loadChecklist() {
+      let saved = null;
+      try { saved = JSON.parse(localStorage.getItem(VISTORIA_KEY)); } catch {}
+      if (saved && Array.isArray(saved)) return saved;
+      return CHECKLIST_DATA.map(cat => ({
+        ...cat,
+        items: cat.items.map(i => ({ ...i, checked: false }))
+      }));
+    }
+
+    let checklist = loadChecklist();
+
+    function saveChecklist() {
+      localStorage.setItem(VISTORIA_KEY, JSON.stringify(checklist));
+    }
+
+    function renderVistoria() {
+      const totalItems = checklist.reduce((a,c) => a + c.items.length, 0);
+      const checkedItems = checklist.reduce((a,c) => a + c.items.filter(i=>i.checked).length, 0);
+      const progress = totalItems > 0 ? (checkedItems / totalItems) * 100 : 0;
+
+      let html = `
+        <div class="glass-card card-section" style="padding:20px">
+          <div class="card-header" style="margin-bottom:12px">
+            <div class="card-icon gradient-primary"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:hsl(var(--primary-foreground))"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></svg></div>
+            <div style="flex:1"><div class="card-title font-display">Checklist de Vistoria</div><div class="card-subtitle">Verifique cada item antes de comprar</div></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:8px">
+            <div class="progress-bar" style="flex:1"><div class="progress-fill ${progress===100?'gradient-success':'gradient-primary'}" style="width:${progress}%"></div></div>
+            <span style="font-size:14px;font-weight:700" class="font-display text-fg">${checkedItems}/${totalItems}</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button class="btn-secondary" id="btnResetVistoria">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></svg>
+              Resetar
+            </button>
+            <button class="btn-accent" id="btnShareVistoria">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" x2="15.42" y1="13.51" y2="17.49"/><line x1="15.41" x2="8.59" y1="6.51" y2="10.49"/></svg>
+              Compartilhar
+            </button>
+          </div>
+        </div>`;
+
+      checklist.forEach((cat, ci) => {
+        const catChecked = cat.items.filter(i=>i.checked).length;
+        const isDone = catChecked === cat.items.length;
+        html += `
+          <div class="glass-card" style="border-radius:16px;overflow:hidden">
+            <div class="cat-header">
+              <h3 class="cat-title font-display">${cat.icon} ${cat.name}</h3>
+              <span class="cat-badge${isDone?' done':''}">${catChecked}/${cat.items.length}</span>
+            </div>
+            <div style="padding:0 8px 8px">`;
+        cat.items.forEach(item => {
+          const checkedClass = item.checked ? ' checked' : '';
+          const icon = item.checked
+            ? '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-success"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><path d="m9 11 3 3L22 4"/></svg>'
+            : '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-muted"><circle cx="12" cy="12" r="10"/></svg>';
+          html += `<button class="check-item${checkedClass}" data-cat="${ci}" data-id="${item.id}">${icon}<span class="text">${item.text}</span></button>`;
+        });
+        html += '</div></div>';
+      });
+
+      $('#vistoriaContent').innerHTML = html;
+
+      // Wire events
+      $$('.check-item').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const ci = Number(btn.dataset.cat);
+          const id = btn.dataset.id;
+          const item = checklist[ci].items.find(i => i.id === id);
+          if (item) { item.checked = !item.checked; saveChecklist(); renderVistoria(); }
+        });
+      });
+      const resetBtn = $('#btnResetVistoria');
+      if (resetBtn) resetBtn.addEventListener('click', () => {
+        checklist = CHECKLIST_DATA.map(cat => ({ ...cat, items: cat.items.map(i => ({ ...i, checked: false })) }));
+        saveChecklist(); renderVistoria();
+      });
+      const shareBtn = $('#btnShareVistoria');
+      if (shareBtn) shareBtn.addEventListener('click', () => {
+        const totalI = checklist.reduce((a,c)=>a+c.items.length,0);
+        const checkedI = checklist.reduce((a,c)=>a+c.items.filter(i=>i.checked).length,0);
+        const unchecked = checklist.flatMap(c => c.items.filter(i=>!i.checked).map(i=>'❌ '+i.text));
+        const text = encodeURIComponent(
+          '📋 *Vistoria Veicular - Fipe Scanner*\n\n' +
+          '✅ '+checkedI+'/'+totalI+' itens verificados\n\n' +
+          (unchecked.length > 0 ? '*Pendentes:*\n'+unchecked.slice(0,10).join('\n')+'\n\n' : '') +
+          '_Verificado via Fipe Scanner_'
+        );
+        window.open('https://wa.me/?text='+text, '_blank');
+      });
+    }
+
+    // ══════════════════════════════════════════
+    // ═══ CUSTO TAB LOGIC ═══
+    // ══════════════════════════════════════════
+    function initCusto() {
+      const sel = $('#custoEstado');
+      ESTADOS_IPVA.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.uf; opt.textContent = e.uf + ' (' + e.aliquota + '%)';
+        if (e.uf === 'SP') opt.selected = true;
+        sel.appendChild(opt);
+      });
+      const fipeInput = $('#custoValorFipe');
+      fipeInput.addEventListener('input', () => { fipeInput.value = formatNumInput(fipeInput.value); });
+
+      $('#btnCalcularCusto').addEventListener('click', () => {
+        const fipe = Number(fipeInput.value.replace(/\D/g,''));
+        const km = Number($('#custoKm').value);
+        const cons = Number($('#custoConsumo').value.replace(',','.'));
+        const preco = Number($('#custoPrecoComb').value.replace(',','.'));
+        const idade = Number($('#custoIdade').value);
+        const aliquota = ESTADOS_IPVA.find(e=>e.uf===sel.value)?.aliquota || 4;
+        if (!fipe || !km || !cons || !preco) return;
+
+        const ipva = (fipe * (aliquota/100)) / 12;
+        const seguro = (fipe * (idade>10?0.06:idade>5?0.05:0.04)) / 12;
+        const combustivel = (km / cons) * preco;
+        const manutencao = idade>10?450:idade>5?300:180;
+        const total = ipva + seguro + combustivel + manutencao;
+
+        const area = $('#custoResultArea');
+        area.innerHTML = `
+          <div class="result-hero fade-in">
+            <div class="result-hero-top gradient-primary" style="color:hsl(var(--primary-foreground))">
+              <p class="label">Custo mensal total</p>
+              <p class="value font-display">${formatCurrency(Math.round(total))}</p>
+              <p class="sub">${formatCurrency(Math.round(total*12))}/ano</p>
+            </div>
+          </div>
+          <div class="glass-card card-section space-y-sm" style="padding:20px">
+            ${renderCostBar('Combustível','⛽',Math.round(combustivel),Math.round(total),'gradient-warning')}
+            ${renderCostBar('IPVA','💲',Math.round(ipva),Math.round(total),'gradient-primary')}
+            ${renderCostBar('Seguro','🛡️',Math.round(seguro),Math.round(total),'gradient-danger')}
+            ${renderCostBar('Manutenção','🔧',manutencao,Math.round(total),'bg-muted-fg')}
+          </div>
+          <div class="glass-card tip-card">
+            <p class="tip-title">💡 Dica</p>
+            <p class="tip-text">${combustivel > total*0.5
+              ? 'Combustível é mais da metade do custo. Considere um carro mais econômico ou com motor flex.'
+              : seguro > ipva
+              ? 'Seguro está caro. Pesquise em diferentes seguradoras e considere rastreador para desconto.'
+              : 'Distribuição de custos equilibrada. Mantenha as revisões em dia para evitar surpresas!'}</p>
+          </div>`;
+        area.style.display = 'block';
+      });
+    }
+
+    function renderCostBar(label, icon, value, total, colorClass) {
+      const pct = total > 0 ? (value / total) * 100 : 0;
+      const bgClass = colorClass === 'bg-muted-fg' ? 'background:hsl(var(--muted-foreground))' : '';
+      return `
+        <div class="cost-row">
+          <div class="cost-icon"><span style="font-size:16px">${icon}</span></div>
+          <div class="cost-bar-wrap">
+            <div class="cost-bar-top">
+              <span class="cost-bar-label">${label}</span>
+              <span class="cost-bar-value font-display">${formatCurrency(value)}/mês</span>
+            </div>
+            <div class="cost-bar">
+              <div class="cost-bar-fill ${colorClass !== 'bg-muted-fg' ? colorClass : ''}" style="width:${pct}%;${bgClass}"></div>
+            </div>
+          </div>
+        </div>`;
+    }
+
+    // ══════════════════════════════════════════
+    // ═══ DETRAN TAB LOGIC ═══
+    // ══════════════════════════════════════════
+    function initDetran() {
+      const sel = $('#detranUF');
+      Object.entries(DETRAN_URLS).sort((a,b)=>a[1].nome.localeCompare(b[1].nome)).forEach(([uf,info]) => {
+        const opt = document.createElement('option');
+        opt.value = uf; opt.textContent = info.nome + ' (' + uf + ')';
+        sel.appendChild(opt);
+      });
+
+      const placaInput = $('#detranPlaca');
+      placaInput.addEventListener('input', () => {
+        const raw = placaInput.value.toUpperCase().replace(/[^A-Z0-9]/g,'').slice(0,7);
+        placaInput.value = raw.length > 3 ? raw.slice(0,3) + '-' + raw.slice(3) : raw;
+        $('#detranError').style.display = 'none';
+        if (raw.length >= 3) {
+          const uf = detectUF(raw);
+          if (uf) sel.value = uf;
+        }
+      });
+
+      $('#btnDetran').addEventListener('click', () => {
+        const clean = placaInput.value.toUpperCase().replace(/[^A-Z0-9]/g,'');
+        const antigoRe = /^[A-Z]{3}\d{4}$/;
+        const mercoRe = /^[A-Z]{3}\d[A-Z]\d{2}$/;
+        if (!antigoRe.test(clean) && !mercoRe.test(clean)) {
+          showDetranError('Placa inválida. Use o formato ABC-1234 ou ABC1D23.');
+          return;
+        }
+        if (!sel.value || !DETRAN_URLS[sel.value]) {
+          showDetranError('Selecione o estado do veículo.');
+          return;
+        }
+        window.open(DETRAN_URLS[sel.value].url, '_blank', 'noopener,noreferrer');
+      });
+    }
+
+    function detectUF(placa) {
+      const clean = placa.toUpperCase().replace(/[^A-Z0-9]/g,'');
+      if (clean.length < 3) return null;
+      const prefix = clean.slice(0,3);
+      for (const f of PLACA_FAIXAS) {
+        if (prefix >= f.inicio && prefix <= f.fim) return f.uf;
+      }
+      return null;
+    }
+
+    function showDetranError(msg) {
+      const el = $('#detranError');
+      el.textContent = msg; el.style.display = 'block';
+    }
+
+    // ══════════════════════════════════════════
+    // ═══ INIT ═══
+    // ══════════════════════════════════════════
+    initTheme();
+    loadMarcas();
+    renderVistoria();
+    initCusto();
+    initDetran();
+
+  })();
+  </script>
+</body>
 </html>
